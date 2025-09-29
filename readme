@@ -1,0 +1,53 @@
+Idée : 1) Point légal important (à lire avant de coder)
+
+N’utilise pas les noms, designs, sprites, musiques ou assets officiels Pokémon (Nintendo / Game Freak / Creatures) sans autorisation : c’est du contenu protégé par droits d’auteur. Même pour un projet non commercial, tu prends un risque.
+
+Solutions sûres :
+
+Créer des créatures originales « inspirées » (design et noms originaux).
+
+Utiliser des sprites/illustrations sous licence libre ou achetées (ex : assets pixel art vendus sur des marketplaces) ou créées par toi/membres de ton équipe.
+
+Obtenir la permission explicite de l’auteur d’un asset fan-made si tu veux l’utiliser.
+
+Dans l’UI/communication, évite d’utiliser le mot “Pokémon” de façon à laisser croire que c’est un produit officiel. Tu peux dire « inspiré par les RPG de monstres ».
+
+2) Architecture technique (haut niveau)
+
+Backend : Symfony (API-first). Utilise Doctrine pour les entités et API Platform ou tes propres controllers pour exposer l’API JSON.
+
+Frontend : HTML/CSS/JS + un framework de jeu JS pour mobile (recommandé : Phaser pour 2D / mobile-friendly). Pour une interface site classique, Vue/React ou Stimulus + Twig.
+
+Temps réel / combats multijoueur : WebSockets (Ratchet) ou Mercure (plus simple à intégrer avec Symfony) pour les combats en temps réel et notifications d’enquête.
+
+Stockage : MySQL/Postgres pour données persistantes (joueurs, créatures, enquêtes, preuves). S3-compatible pour assets.
+
+Auth : JWT pour API mobile + sessions côté web. RBAC pour modération/admin.
+
+Déploiement : Docker + CI (GitHub Actions / GitLab CI) + hébergement (Railway, DigitalOcean, AWS).
+
+3) Systèmes de jeu — idées et mécaniques
+a) TeamVilanous (organisations criminelles)
+
+Chaque team a :
+
+name, credo (texte), philosophie (ex : « ordre par chaos », « survie du plus fort »), color_theme, bonus_passif (modificateur gameplay).
+Exemples de credo : “La force prime”, “Libérer les créatures de la loi”, “Saccager pour prospérer”.
+
+b) Vol de créatures (mécanique)
+
+Vol = tentative : probabilité de succès dépend du niveau du voleur, niveau de la créature, outils (grenades de sommeil, dispositifs), environnement.
+
+Conséquences : échec = alerte → enquête + risque de réputation. Succès = objet volé + créature capturée.
+
+Système anti-abus : cooldowns, limites de vols par journée, pertes réputation pour maintenir un jeu équilibré.
+
+c) Combats (tour-par-tour conseillé pour mobile)
+
+Chaque créature a HP, attack, defense, speed, types, skills[].
+
+Tour-par-tour : ordre par speed. Compétences avec effets (dégâts, statut, buffs/debuffs).
+
+Types & efficacités : table de modificateurs (x2, x0.5, etc.).
+
+Calcul de dégâts (exemple simple) :
