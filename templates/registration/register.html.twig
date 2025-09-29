@@ -1,0 +1,417 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recrutement de Sbires{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        /* Importation d'une police "menaçante" pour le thème */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Wallpoet&display=swap');
+
+        :root {
+            --team-rocket-red: #cc0000;
+            --team-rocket-black: #222222;
+            --background-dark: #121212;
+            --card-color: #1e1e1e;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: #eeeeee;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .villain-card {
+            background-color: var(--card-color);
+            border: 3px solid var(--team-rocket-red);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--team-rocket-red);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Titres immersifs */
+        .card-header h1 {
+            font-family: 'Wallpoet', cursive;
+            color: var(--team-rocket-red);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px var(--team-rocket-red);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                text-shadow: 0 0 5px var(--team-rocket-red);
+            }
+            to {
+                text-shadow: 0 0 15px var(--team-rocket-red);
+            }
+        }
+
+        .card-header p {
+            color: #aaaaaa;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+
+        /* Styles des champs de formulaire */
+        .form-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--team-rocket-red);
+            box-shadow: 0 0 8px rgba(204, 0, 0, 0.7);
+            outline: none;
+        }
+
+        /* Champ de sélection de l'équipe (le plus dynamique) */
+        .team-select-group {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 2px dashed #555;
+            border-radius: 10px;
+            background-color: #222222;
+        }
+
+        .team-select-group label {
+            text-align: left; /* Aligner à gauche pour plus de clarté */
+            margin-bottom: 10px;
+            color: #dddddd;
+            font-size: 1.1rem;
+            display: block;
+        }
+        
+        /* Conteneur pour l'icône de l'équipe */
+        .team-display-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .team-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333;
+            border: 3px solid #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            margin-right: 15px;
+            transition: all 0.5s ease-out;
+            color: white; /* Couleur par défaut */
+            animation: teamFade 0.5s;
+        }
+
+        @keyframes teamFade {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Custom style pour le select de l'équipe pour l'animation */
+        .team-select {
+            appearance: none; /* Cache le style par défaut du select */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CC0000'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 20px auto;
+            cursor: pointer;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Style pour les options d'équipe */
+        .team-select option {
+            background-color: #121212;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        /* Bouton d'inscription */
+        .btn-register {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--team-rocket-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        .btn-register:hover {
+            background-color: #ff3333;
+            box-shadow: 0 8px 20px rgba(204, 0, 0, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(204, 0, 0, 0.5);
+        }
+
+        /* Styles pour les messages d'erreur (si validation échoue) */
+        .is-invalid .form-control, .form-control.is-invalid {
+            border-color: #ff4d4d;
+            box-shadow: 0 0 5px #ff4d4d;
+        }
+
+        .invalid-feedback {
+            color: #ff4d4d;
+            text-align: left;
+            margin-top: -15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: block; /* S'assurer qu'il est visible en cas d'erreur */
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .villain-card {
+                padding: 20px;
+            }
+
+            .card-header h1 {
+                font-size: 2rem;
+            }
+
+            .btn-register {
+                font-size: 1rem;
+                padding: 12px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="villain-card">
+        <div class="card-header">
+            <!-- Icône Team Rocket par défaut -->
+            <span class="team-logo" id="default-logo" style="background-color: var(--team-rocket-black); border-color: var(--team-rocket-red); color: white;">R</span>
+            <h1>RECRUTEMENT POUR ÊTRE UN SBIRE</h1>
+            <p>Entrez vos coordonnées, choisissez votre allégeance, et préparez-vous à servir le Mal suprême !</p>
+        </div>
+
+        {# Utilisation du `form_start` et `form_end` de Symfony pour la gestion du formulaire #}
+        {{ form_start(registrationForm) }}
+
+            {# Email et Nom de Code sont des champs simples #}
+            <div class="form-group">
+                {{ form_label(registrationForm.email, 'Email de contact (Canal de communication crypté)') }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'votre.nom@secret-sbire.com'}}) }}
+                {{ form_errors(registrationForm.email) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(registrationForm.codename, 'Nom de code (Alias d\'Opération)') }}
+                {{ form_widget(registrationForm.codename, {'attr': {'class': 'form-control', 'placeholder': 'Ex: RedWolf, Glitch, Kuro...'}}) }}
+                {{ form_errors(registrationForm.codename) }}
+            </div>
+
+            {# Bloc dynamique pour le choix de l'équipe #}
+            <div class="team-select-group">
+                {{ form_label(registrationForm.teamVilain, 'Choix de l\'Organisation Criminelle') }}
+
+                <div class="team-display-container">
+                    <!-- Ce conteneur sera mis à jour par JS -->
+                    <div class="team-logo" id="team-logo">
+                        <span id="team-logo-text">?</span>
+                    </div>
+                    <div class="team-info-display" id="team-info-display" style="text-align: left;">
+                        <strong style="color: #ccc;">Organisation : N/A</strong> <br>
+                        <em style="font-size: 0.9em; font-style: italic; color: #777;" id="team-credo-text">Sélectionnez votre future allégeance ci-dessous.</em>
+                    </div>
+                </div>
+
+                {{ form_widget(registrationForm.teamVilain, {'attr': {'class': 'form-control team-select', 'id': 'team-selector'}}) }}
+                {{ form_errors(registrationForm.teamVilain) }}
+            </div>
+
+            {# Mots de passe #}
+            <div class="form-group">
+                {{ form_label(registrationForm.plainPassword.first) }}
+                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe sécurisé (Protocole 13)'}}) }}
+                {{ form_errors(registrationForm.plainPassword.first) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(registrationForm.plainPassword.second) }}
+                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirmez le Mot de passe'}}) }}
+                {{ form_errors(registrationForm.plainPassword.second) }}
+            </div>
+
+            {# Bouton de Soumission #}
+            <button type="submit" class="btn-register">ACTIVER L'IDENTIFIANT DE SBIRE !</button>
+
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamSelector = document.getElementById('team-selector');
+            const teamInfoDisplay = document.getElementById('team-info-display');
+            const teamLogo = document.getElementById('team-logo');
+            const teamLogoText = document.getElementById('team-logo-text');
+            const teamCredoText = document.getElementById('team-credo-text');
+            const defaultLogo = document.getElementById('default-logo');
+
+            // Cache le logo par défaut car nous utilisons un logo dynamique maintenant
+            if (defaultLogo) {
+                defaultLogo.style.display = 'none';
+            }
+
+            // --- 1. Récupération des données des équipes passées par le contrôleur ---
+            // On vérifie si la variable Twig 'teamsDetails' a été passée et on l'encode en JSON.
+            // Si la variable n'existe pas (manque dans le contrôleur), on utilise un objet vide.
+            const rawTeams = '{{ teamsDetails|json_encode|raw }}';
+            let teamData = {};
+            
+            if (rawTeams) {
+                try {
+                    // Le JSON encodé contient les entités TeamVilain.
+                    // On les transforme en un objet JS indexé par l'ID de l'équipe
+                    JSON.parse(rawTeams).forEach(team => {
+                        teamData[team.id] = {
+                            name: team.name,
+                            credo: team.credo,
+                            color: team.colorCode,
+                            // Utilise la première lettre comme icône par défaut
+                            icon: team.name.charAt(0).toUpperCase() 
+                        };
+                    });
+                } catch (e) {
+                    console.error("Erreur lors du parsing des données d'équipe :", e);
+                }
+            } else {
+                 console.warn("La variable 'teamsDetails' n'a pas été passée au template Twig. La dynamique des couleurs ne fonctionnera pas.");
+
+                 // Fallback: Créer les données d'équipe à partir des options du select (sans couleur/credo réel)
+                 Array.from(teamSelector.options).forEach(option => {
+                     if (option.value) {
+                         // On réutilise la couleur aléatoire de l'implémentation précédente si teamsDetails manque
+                         const fallbackColors = ['#B71C1C', '#1A237E', '#FF6F00', '#004D40', '#4527A0', '#D84315', '#0D47A1', '#6A1B9A', '#388E3C', '#212121'];
+                         teamData[option.value] = {
+                             name: option.text,
+                             credo: "Nous conquerrons le monde !", 
+                             color: fallbackColors[Math.floor(Math.random() * fallbackColors.length)],
+                             icon: option.text.charAt(0).toUpperCase()
+                         };
+                     }
+                 });
+            }
+
+            const defaultCardColor = 'var(--team-rocket-red)';
+            const defaultShadow = '0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--team-rocket-red)';
+            
+            // --- 2. Fonction de mise à jour de l'affichage ---
+            function updateTeamDisplay(teamId) {
+                const villainCard = document.querySelector('.villain-card');
+                
+                // Animation de sortie
+                teamInfoDisplay.style.opacity = '0';
+                teamLogo.style.opacity = '0';
+                
+                // Réinitialisation de la couleur de la bordure
+                villainCard.style.transition = 'border-color 0.5s ease, box-shadow 0.5s ease';
+                
+                setTimeout(() => {
+                    const selectedOption = teamSelector.options[teamSelector.selectedIndex];
+                    const selectedTeam = teamData[teamId];
+                    
+                    if (teamId && selectedTeam) {
+                        // Mise à jour de la couleur d'accentuation
+                        const teamColor = selectedTeam.color || defaultCardColor;
+                        
+                        // Mise à jour du logo
+                        teamLogoText.textContent = selectedTeam.icon;
+                        teamLogo.style.backgroundColor = teamColor;
+                        teamLogo.style.borderColor = teamColor;
+                        teamLogo.style.color = '#fff';
+
+                        // Mise à jour des informations
+                        teamInfoDisplay.innerHTML = `<strong style="color: ${teamColor};">${selectedTeam.name} (${selectedTeam.icon})</strong>`;
+                        teamCredoText.textContent = `Devise : "${selectedTeam.credo}"`;
+                        teamCredoText.style.color = teamColor;
+                        
+                        // Mise à jour de la carte
+                        villainCard.style.borderColor = teamColor;
+                        villainCard.style.boxShadow = `0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px ${teamColor}`;
+                        
+                    } else {
+                        // État initial ou "Choisis ton équipe"
+                        teamLogoText.textContent = '?';
+                        teamLogo.style.backgroundColor = '#333';
+                        teamLogo.style.borderColor = '#555';
+                        teamLogo.style.color = '#fff';
+
+                        teamInfoDisplay.innerHTML = '<strong style="color: #ccc;">Organisation : N/A</strong>';
+                        teamCredoText.textContent = 'Sélectionnez votre future allégeance ci-dessous.';
+                        teamCredoText.style.color = '#777';
+
+                        villainCard.style.borderColor = defaultCardColor;
+                        villainCard.style.boxShadow = defaultShadow;
+                    }
+
+                    // Animation d'entrée
+                    teamInfoDisplay.style.opacity = '1';
+                    teamLogo.style.opacity = '1';
+
+                }, 200); // Délai pour l'animation de fondu
+            }
+
+            // --- 3. Événements ---
+            
+            // Événement au changement de sélection
+            teamSelector.addEventListener('change', function() {
+                updateTeamDisplay(this.value);
+            });
+            
+            // Initialisation de l'affichage si une équipe est présélectionnée
+            updateTeamDisplay(teamSelector.value);
+        });
+    </script>
+{% endblock %}

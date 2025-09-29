@@ -1,20 +1,82 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Team Rocket - Recrutement{% endblock %}</title>
 
-{% block title %}Hello HomeController!{% endblock %}
+    {# --------- CSS GLOBAL --------- #}
+    <style>
+        /* Variables de couleurs (même que register.html.twig) */
+        :root {
+            --team-rocket-red: #cc0000;
+            --team-rocket-black: #222222;
+            --background-dark: #121212;
+            --card-color: #1e1e1e;
+            --text-light: #eeeeee;
+        }
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+        /* Reset rapide */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<div class="example-wrapper">
-    <h1>Hello {{ app.user.codename }} - {{ app.user.teamVilain.name }}! ✅</h1>
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/billy/Team-Rocket/teamrocket/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/home/billy/Team-Rocket/teamrocket/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
-{% endblock %}
+        /* Police « méchante » importée ici pour tout le site */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Wallpoet&display=swap');
+
+        /* Petit header global (facultatif) */
+        header {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: var(--team-rocket-black);
+            border-bottom: 2px solid var(--team-rocket-red);
+            font-family: 'Wallpoet', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        /* Zone de contenu principal */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Footer minimal */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #aaa;
+            background: #0a0a0a;
+        }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body>
+    <header>
+         Bonjour
+    </header>
+
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <footer>
+        &copy; {{ "now"|date("Y") }} Team Rocket. Tous droits de conquête mondiaux réservés.
+    </footer>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

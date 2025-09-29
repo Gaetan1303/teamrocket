@@ -7,70 +7,36 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Entité représentant une « équipe de vilains » dans le système.
- * 
- * Une TeamVilain est identifiée de façon unique par son nom, possède une
- * région d’activité, un credo (sa « devise » ou philosophie), un code couleur
- * hexadécimal optionnel et peut contenir plusieurs membres.
- */
 #[ORM\Entity(repositoryClass: TeamVilainRepository::class)]
 class TeamVilain
 {
-    /**
-     * Identifiant technique auto-généré par Doctrine.
-     * @var int|null
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * Nom de l’équipe (unique dans la base).
-     * @var string|null
-     */
     #[ORM\Column(length: 50, unique: true)]
     private ?string $name = null;
 
-    /**
-     * Région géographique ou zone d’influence de l’équipe.
-     * @var string|null
-     */
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $region = null;
 
-    /**
-     * Credo / devise de l’équipe.
-     * @var string|null
-     */
     #[ORM\Column(length: 255)]
     private ?string $credo = null;
 
-    /**
-     * Code couleur au format hexadécimal (ex: « #FF0000 »).
-     * @var string|null
-     */
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $colorCode = null;
 
-    /**
-     * Collection des membres appartenant à cette équipe.
-     * Relation OneToMany vers Sbire (l’inverse se trouve dans Sbire::$teamVilain).
-     * @var Collection<int, Sbire>
-     */
+    // ➜ propriété renommée en minuscule pour correspondre à mappedBy="teamVilain"
     #[ORM\OneToMany(targetEntity: Sbire::class, mappedBy: 'teamVilain')]
-    private Collection $Sbires;
+    private Collection $sbires;
 
-    /**
-     * Constructeur : initialise la collection de membres.
-     */
     public function __construct()
     {
-        $this->Sbires = new ArrayCollection();
+        $this->sbires = new ArrayCollection();
     }
 
-    /* ──────────────── Getters & Setters ──────────────── */
+    /* -------------------- getters / setters -------------------- */
 
     public function getId(): ?int
     {
@@ -122,33 +88,25 @@ class TeamVilain
     }
 
     /**
-     * Retourne la collection des sbires de l’équipe.
      * @return Collection<int, Sbire>
      */
     public function getSbires(): Collection
     {
-        return $this->Sbires;
+        return $this->sbires;
     }
 
-    /**
-     * Ajoute un sbire à l’équipe tout en maintenant la cohérence bidirectionnelle.
-     */
     public function addSbire(Sbire $sbire): static
     {
-        if (!$this->Sbires->contains($sbire)) {
-            $this->Sbires->add($sbire);
+        if (!$this->sbires->contains($sbire)) {
+            $this->sbires->add($sbire);
             $sbire->setTeamVilain($this);
         }
         return $this;
     }
 
-    /**
-     * Retire un sbire de l’équipe et met à jour l’association inverse.
-     */
     public function removeSbire(Sbire $sbire): static
     {
-        if ($this->Sbires->removeElement($sbire)) {
-            // On s’assure que le sbire ne pointe plus vers cette équipe
+        if ($this->sbires->removeElement($sbire)) {
             if ($sbire->getTeamVilain() === $this) {
                 $sbire->setTeamVilain(null);
             }
