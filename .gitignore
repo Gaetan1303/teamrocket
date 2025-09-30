@@ -18,3 +18,18 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+/Caddyfile
+.DS_Store
+/build/
+/node_modules/
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+.idea/
+.vscode/
+.phpstorm.meta.php
+.php_cs.cache
+/.php-cs-fixer.cache
+/.symfony.local.php
+/Caddyfile.tmp
+/public/bundles
