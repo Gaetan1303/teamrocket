@@ -48,7 +48,8 @@
         "symfonycasts/verify-email-bundle": "^1.17",
         "twig/extra-bundle": "^3.21",
         "twig/string-extra": "^3.21",
-        "twig/twig": "^2.12|^3.0"
+        "twig/twig": "^2.12|^3.0",
+        "vich/uploader-bundle": "^2.8"
     },
     "config": {
         "allow-plugins": {
