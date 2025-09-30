@@ -66,11 +66,35 @@
 
 <body>
     <header>
-         Bonjour
+               
+                {% if app.user %}
+                     <p>Bienvenue, {{ app.user.codename }} !</p>
+                {% else %}
+                     <p>Aucun sbire connecté.</p>
+                {% endif %}
     </header>
 
     <main>
-        {% block body %}{% endblock %}
+        {% block body %} 
+            <h1>Bienvenue dans l'interface de gestion des Pokémons</h1>
+
+
+
+
+
+
+
+
+
+
+        {% endblock %}
+        
+        
+        
+        
+        {# Affichage des Pokémons #}
+        
+
     </main>
 
     <footer>

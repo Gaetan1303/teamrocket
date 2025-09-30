@@ -38,108 +38,60 @@ class Sbire implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $starterPokemon = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $starterPokemonId = null;
+
+    #[ORM\Column(options: ["default" => false])]
+    private bool $hasDoneFirstTheft = false;
+
     public function __construct()
     {
         $this->uuid = \Symfony\Component\Uid\Uuid::v4()->toRfc4122();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    // -------- getters & setters --------
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-        return $this;
-    }
+    public function getEmail(): ?string { return $this->email; }
+    public function setEmail(string $email): static { $this->email = $email; return $this; }
 
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
-    }
+    public function getUserIdentifier(): string { return (string) $this->email; }
 
-    public function getCodename(): ?string
-    {
-        return $this->codename;
-    }
+    public function getCodename(): ?string { return $this->codename; }
+    public function setCodename(string $codename): static { $this->codename = $codename; return $this; }
 
-    public function setCodename(string $codename): static
-    {
-        $this->codename = $codename;
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
+    public function getRoles(): array {
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
     }
+    public function setRoles(array $roles): static { $this->roles = $roles; return $this; }
 
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-        return $this;
-    }
+    public function getPassword(): ?string { return $this->password; }
+    public function setPassword(string $password): static { $this->password = $password; return $this; }
 
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
+    public function getSalt(): ?string { return null; }
+    public function eraseCredentials(): void {}
 
-    public function setPassword(string $password): static
-    {
-        $this->password = $password;
-        return $this;
-    }
+    public function getUuid(): ?string { return $this->uuid; }
+    public function setUuid(string $uuid): static { $this->uuid = $uuid; return $this; }
 
-    public function getSalt(): ?string
-    {
-        return null;
-    }
+    public function getTeamVilain(): ?TeamVilain { return $this->teamVilain; }
+    public function setTeamVilain(?TeamVilain $teamVilain): static { $this->teamVilain = $teamVilain; return $this; }
 
-    public function eraseCredentials(): void
-    {
-        // rien à effacer si tu n'as pas de données sensibles temporaires
-    }
+    public function isVerified(): bool { return $this->isVerified; }
+    public function setIsVerified(bool $isVerified): static { $this->isVerified = $isVerified; return $this; }
 
-    public function getUuid(): ?string
-    {
-        return $this->uuid;
-    }
+    public function getStarterPokemon(): ?string { return $this->starterPokemon; }
+    public function setStarterPokemon(?string $starter): static { $this->starterPokemon = $starter; return $this; }
 
-    public function setUuid(string $uuid): static
-    {
-        $this->uuid = $uuid;
-        return $this;
-    }
+    public function getStarterPokemonId(): ?int { return $this->starterPokemonId; }
+    public function setStarterPokemonId(?int $id): static { $this->starterPokemonId = $id; return $this; }
 
-    public function getTeamVilain(): ?TeamVilain
-    {
-        return $this->teamVilain;
-    }
-
-    public function setTeamVilain(?TeamVilain $teamVilain): static
-    {
-        $this->teamVilain = $teamVilain;
-        return $this;
-    }
-
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setIsVerified(bool $isVerified): static
-    {
-        $this->isVerified = $isVerified;
-
-        return $this;
-    }
+    public function hasDoneFirstTheft(): bool { return $this->hasDoneFirstTheft; }
+    public function setHasDoneFirstTheft(bool $done): static { $this->hasDoneFirstTheft = $done; return $this; }
 }
