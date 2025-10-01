@@ -12,6 +12,18 @@
         {% endblock %}
     </head>
     <body>
+        <script>
+            // Expose MERCURE_PUBLIC_URL to client-side JS if configured (uses twig global)
+            {% if MERCURE_PUBLIC_URL is defined and MERCURE_PUBLIC_URL %}
+                window.MERCURE_PUBLIC_URL = {{ MERCURE_PUBLIC_URL|json_encode }};
+            {% else %}
+                window.MERCURE_PUBLIC_URL = '';
+            {% endif %}
+            {# Dev-only: expose a pre-generated MERCURE JWT for browser subscriptions (do not enable in prod) #}
+            {% if app.environment == 'dev' and (env('MERCURE_DEV_JWT') is defined) and env('MERCURE_DEV_JWT') %}
+                window.MERCURE_JWT = {{ env('MERCURE_DEV_JWT')|json_encode }};
+            {% endif %}
+        </script>
         {% block body %}{% endblock %}
     </body>
-</html
+</html>
