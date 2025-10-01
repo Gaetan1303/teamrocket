@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Team Rocket - Recrutement{% endblock %}</title>
 
-    {# --------- CSS GLOBAL --------- #}
     <style>
-        /* Variables de couleurs (même que register.html.twig) */
         :root {
             --team-rocket-red: #cc0000;
-            --team-rocket-black: #222222;
-            --background-dark: #121212;
-            --card-color: #1e1e1e;
-            --text-light: #eeeeee;
+            --team-rocket-black: #222;
+            --bg-dark: #121212;
+            --text-light: #eee;
         }
 
-        /* Reset rapide */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--background-dark);
+            background: var(--bg-dark);
             color: var(--text-light);
             font-family: 'Roboto', sans-serif;
             min-height: 100vh;
@@ -28,30 +24,47 @@
             flex-direction: column;
         }
 
-        /* Police « méchante » importée ici pour tout le site */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Wallpoet&display=swap');
-
-        /* Petit header global (facultatif) */
         header {
-            width: 100%;
-            padding: 1rem 2rem;
             background: var(--team-rocket-black);
             border-bottom: 2px solid var(--team-rocket-red);
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .brand {
             font-family: 'Wallpoet', cursive;
             font-size: 1.5rem;
             letter-spacing: 2px;
+            color: var(--team-rocket-red);
         }
 
-        /* Zone de contenu principal */
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--team-rocket-red);
+        }
+
         main {
             flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 2rem;
         }
 
-        /* Footer minimal */
         footer {
             text-align: center;
             padding: 1rem;
@@ -66,35 +79,24 @@
 
 <body>
     <header>
-               
+        <nav>
+            <div class="brand">Team Rocket</div>
+            <ul>
+                <li><a href="{{ path('app_home') }}">Accueil</a></li>
+
                 {% if app.user %}
-                     <p>Bienvenue, {{ app.user.codename }} !</p>
+                    <li><span>Bienvenue, {{ app.user.codename }}</span></li>
+                    <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
                 {% else %}
-                     <p>Aucun sbire connecté.</p>
+                    <li><a href="{{ path('app_register') }}">Inscription</a></li>
+                    <li><a href="{{ path('app_login') }}">Connexion</a></li>
                 {% endif %}
+            </ul>
+        </nav>
     </header>
 
     <main>
-        {% block body %} 
-            <h1>Bienvenue dans l'interface de gestion des Pokémons</h1>
-        
-
-
-
-
-
-
-
-
-
-        {% endblock %}
-        
-        
-        
-        
-        {# Affichage des Pokémons #}
-        
-
+        {% block body %}{% endblock %}
     </main>
 
     <footer>
