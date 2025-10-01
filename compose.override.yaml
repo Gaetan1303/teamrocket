@@ -35,8 +35,8 @@ services:
     environment:
       # Disable automatic HTTPS inside the hub container so the hub serves plain HTTP on port 80
       SERVER_NAME: ':80'
-      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
-      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_PUBLISHER_JWT_KEY: 'super_secret_mercure_key_1a2b3c4d5e6f7g8h9i0jklmnopqrstuvwxyz123456'
+      MERCURE_SUBSCRIBER_JWT_KEY: 'super_secret_mercure_key_1a2b3c4d5e6f7g8h9i0jklmnopqrstuvwxyz123456'
       # Ensure the hub listens on port 3000 (default for this image)
       MERCURE_ADDITIONAL_OPTIONS: ''
     ports:

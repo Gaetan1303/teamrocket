@@ -12,12 +12,17 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 
 #[AsCommand(name: 'app:simulate-chat', description: 'Simulate chat messages to test Mercure and the chat pipeline')]
 class SimulateChatCommand extends Command
 {
-    public function __construct(private EntityManagerInterface $em, private ?HubInterface $hub = null)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private ?HubInterface $hub = null,
+        #[\Symfony\Component\DependencyInjection\Attribute\Autowire('%mercure.jwt.key%')]
+        private string $publisherJwt = ''
+    ) {
         parent::__construct();
     }
 
@@ -40,7 +45,6 @@ class SimulateChatCommand extends Command
         // Ensure there's at least one sbire to use
         $sbires = $repoSbire->findBy([], null, 5);
         if (empty($sbires)) {
-            // create some dummy sbires
             for ($i = 1; $i <= 3; $i++) {
                 $s = new Sbire();
                 $s->setEmail("sim{$i}@example.com");
@@ -58,16 +62,33 @@ class SimulateChatCommand extends Command
             $author = $sbires[array_rand($sbires)];
             $message = sprintf('Simulated message #%d from %s', $i + 1, $author->getCodename());
 
-            if ($direct && $this->hub) {
-                // publish directly
+            if ($direct) {
                 $topic = $teamId ? 'urn:teamrocket:chat:team/' . $teamId : 'urn:teamrocket:chat:global';
-                $this->hub->publish(new \Symfony\Component\Mercure\Update($topic, json_encode([
+                $data = [
                     'id' => 'sim-' . uniqid(),
                     'author' => $author->getCodename(),
                     'message' => $message,
                     'time' => (new \DateTimeImmutable())->format('H:i'),
-                ])));
-                $output->writeln("Published direct to $topic: $message");
+                ];
+                $update = [
+                    'topic' => $topic,
+                    'data' => json_encode($data),
+                ];
+                $ch = curl_init('http://localhost:9080/.well-known/mercure');
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($update));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Authorization: Bearer ' . $this->publisherJwt,
+                ]);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($httpCode === 200) {
+                    $output->writeln("Published direct to $topic: $message");
+                } else {
+                    $output->writeln("Failed to publish direct to $topic: $message (HTTP $httpCode) Response: $response");
+                }
             } else {
                 // persist a Chat so doctrine listener dispatches and the normal pipeline runs
                 $chat = new Chat();
