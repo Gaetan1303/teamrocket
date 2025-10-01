@@ -1,108 +1,31 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Team Rocket - Recrutement{% endblock %}</title>
+{% extends 'base.html.twig' %}
 
-    <style>
-        :root {
-            --team-rocket-red: #cc0000;
-            --team-rocket-black: #222;
-            --bg-dark: #121212;
-            --text-light: #eee;
-        }
+{% block title %}Team Rocket - Recrutement{% endblock %}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+{% block body %}
+<div data-controller="chat"
+     data-chat-user-value="{{ app.user ? app.user.codename|e('js') : '' }}"
+     data-chat-mercure-url-value="{{ MERCURE_PUBLIC_URL|e('js') }}"
+     data-chat-teams-value='{{ teamData|json_encode|raw }}'
+>
+    <section style="max-width:800px;margin:1rem auto;background:#0b0b0b;padding:1rem;border:1px solid #222;border-radius:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+            <h2 style="margin:0">Chat</h2>
+            <select data-chat-target="teamSelect" style="background:#111;color:#fff;border:1px solid #333;padding:0.4rem;border-radius:4px;"></select>
+        </div>
 
-        body {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Roboto', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        <div data-chat-target="list" style="max-height:300px;overflow:auto;padding:0.5rem;"></div>
 
-        header {
-            background: var(--team-rocket-black);
-            border-bottom: 2px solid var(--team-rocket-red);
-            padding: 1rem 2rem;
-        }
+        <form data-chat-target="form" data-action="submit->chat#send" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+            <input data-chat-target="input" type="text" placeholder="Tapez votre message..." style="flex:1;padding:0.5rem;border-radius:4px;border:1px solid #333;" />
+            <button type="submit" style="padding:0.5rem 1rem;border-radius:4px;border:none;background:#cc0000;color:#fff;">Envoyer</button>
+        </form>
+    </section>
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        nav .brand {
-            font-family: 'Wallpoet', cursive;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            color: var(--team-rocket-red);
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        nav a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--team-rocket-red);
-        }
-
-        main {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
-            color: #aaa;
-            background: #0a0a0a;
-        }
-    </style>
-
-    {% block stylesheets %}{% endblock %}
-</head>
-
-<body>
-    <header>
-        <nav>
-            <div class="brand">Team Rocket</div>
-            <ul>
-                <li><a href="{{ path('app_home') }}">Accueil</a></li>
-
-                {% if app.user %}
-                    <li><span>Bienvenue, {{ app.user.codename }}</span></li>
-                    <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
-                {% else %}
-                    <li><a href="{{ path('app_register') }}">Inscription</a></li>
-                    <li><a href="{{ path('app_login') }}">Connexion</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        {% block body %}{% endblock %}
-    </main>
-
-    <footer>
-        &copy; {{ "now"|date("Y") }} Team Rocket. Tous droits de conquête mondiaux réservés.
-    </footer>
-
-    {% block javascripts %}{% endblock %}
-</body>
-</html>
+</div>
+<style>
+    .chat-item img { width:32px; height:32px; border-radius:50%; }
+    .chat-item { transition: background 120ms ease; }
+    .chat-item:hover { background: rgba(255,255,255,0.02); }
+</style>
+{% endblock %}

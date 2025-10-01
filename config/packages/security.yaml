@@ -18,7 +18,9 @@ security:
         main:
             lazy: true
             provider: sbire_provider
-            custom_authenticator: App\Security\AuthAuthenticator
+            custom_authenticator:
+                - App\Security\AuthAuthenticator
+                - App\Security\ChatAuthAuthenticator # Ajout du Chat pour parler 
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -41,6 +43,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/chat, roles: ROLE_USER } # Pour accéder au chat !
 
 when@test:
     security:

@@ -19,9 +19,11 @@
             {% else %}
                 window.MERCURE_PUBLIC_URL = '';
             {% endif %}
-            {# Dev-only: expose a pre-generated MERCURE JWT for browser subscriptions (do not enable in prod) #}
-            {% if app.environment == 'dev' and (env('MERCURE_DEV_JWT') is defined) and env('MERCURE_DEV_JWT') %}
-                window.MERCURE_JWT = {{ env('MERCURE_DEV_JWT')|json_encode }};
+            {# Dev-only: expose a pre-generated MERCURE JWT for browser subscriptions (do not enable in prod).
+               Use a Twig variable `MERCURE_DEV_JWT` if provided (for example via controller or Twig globals).
+               Avoid calling the `env()` function which may not be available in Twig runtime. #}
+            {% if app.environment == 'dev' and (MERCURE_DEV_JWT is defined) and MERCURE_DEV_JWT %}
+                window.MERCURE_JWT = {{ MERCURE_DEV_JWT|json_encode }};
             {% endif %}
         </script>
         {% block body %}{% endblock %}

@@ -10,8 +10,8 @@ services:
   mailer:
     image: axllent/mailpit
     ports:
-      - "1025"
-      - "8025"
+      - "1025:1025"
+      - "45989:8025"
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
@@ -19,6 +19,26 @@ services:
 
 ###> symfony/mercure-bundle ###
   mercure:
+    # No host ports: keep this service internal (Caddy proxy)
+    volumes:
+      # Override the container's Caddyfile with our development Caddyfile
+      - ./docker/mercure/dev.Caddyfile:/etc/caddy/Caddyfile:ro
+    environment:
+      # The dunglas/mercure image runs the actual hub on port 3000 by default
+      # We use Caddy as a front to reverse-proxy /.well-known/mercure to that hub
+      MERCURE_ADDITIONAL_OPTIONS: ''
+  # A lightweight mercure "hub" backend service that listens on port 3000.
+  # Caddy (in the `mercure` service) will reverse-proxy to this service via Docker DNS.
+  mercure-hub:
+    image: dunglas/mercure
+    restart: unless-stopped
+    environment:
+      # Disable automatic HTTPS inside the hub container so the hub serves plain HTTP on port 80
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      # Ensure the hub listens on port 3000 (default for this image)
+      MERCURE_ADDITIONAL_OPTIONS: ''
     ports:
-      - "80"
+      - "9080:80"
 ###< symfony/mercure-bundle ###

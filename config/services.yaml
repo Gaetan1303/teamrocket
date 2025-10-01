@@ -4,6 +4,11 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    env(MERCURE_PUBLIC_URL): ''
+
+twig:
+    globals:
+        MERCURE_PUBLIC_URL: '%env(MERCURE_PUBLIC_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -15,6 +20,15 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    # Explicit listener registrations for chat
+    App\EventListener\ChatDoctrineListener:
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
+    App\EventListener\SendChatMercureListener:
+        tags:
+            - { name: kernel.event_listener, event: 'App\\Event\\ChatMessageEvent', method: onChatMessage }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
