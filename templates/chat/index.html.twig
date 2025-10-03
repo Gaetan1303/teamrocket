@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Chat</h1>
+
+    <script>
+        window.MERCURE_JWT = '{{ mercure_jwt }}';
+    </script>
+
+    <div data-controller="chat"
+         data-chat-mercure-url-value="{{ mercure_url }}">
+        <form data-action="submit->chat#sendMessage">
+            <input type="text" name="message" placeholder="Votre message">
+            <button type="submit">Envoyer</button>
+        </form>
+
+        <div data-chat-target="messages"></div>
+    </div>
+{% endblock %}

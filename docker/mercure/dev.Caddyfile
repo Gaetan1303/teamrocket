@@ -1,0 +1,20 @@
+:80
+encode gzip
+
+# Allow the dev app (usually running on 127.0.0.1:8000) to access Mercure
+header Access-Control-Allow-Origin "http://127.0.0.1:8000"
+header Access-Control-Allow-Credentials "true"
+header Access-Control-Allow-Methods "GET,POST,OPTIONS"
+header Access-Control-Allow-Headers "Content-Type,Authorization"
+
+# Proxy Mercure hub (internal service) to the /.well-known/mercure path
+route /.well-known/mercure* {
+    # Reverse proxy to the mercure hub container (docker service name)
+    # The mercure hub is served by Caddy in the hub container and listens on port 80
+    reverse_proxy mercure-hub:80
+}
+
+# Simple healthcheck for Caddy
+route /healthz {
+    respond "ok"
+}

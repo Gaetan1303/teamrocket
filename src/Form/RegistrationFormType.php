@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Sbire;
+use App\Entity\User;
 use App\Entity\TeamVilain;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -52,7 +52,7 @@ class RegistrationFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Sbire::class,
+            'data_class' => User::class,
         ]);
     }
 }

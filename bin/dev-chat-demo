@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT_DIR"
+
+echo "🧹  Reset dev environment"
+rm -f .env.local
+docker compose down -v --remove-orphans 2>/dev/null || true
+docker system prune -f            >/dev/null 2>&1 || true
+
+echo "🐳  Start services (PostgreSQL + Mercure + MailDev)"
+docker compose up -d --build
+# on attend que les containers soient prêts
+until curl -s http://localhost:9090/healthz >/dev/null; do sleep 1; done
+
+echo "📂  Create DB & run migrations"
+php bin/console doctrine:database:create --if-not-exists -q
+php bin/console doctrine:migrations:migrate --no-interaction -q
+
+echo "🎯  Load CHAT fixtures (global room + 3 teams)"
+php bin/console doctrine:fixtures:load --group=chat --no-interaction -q
+
+echo "🔐  Generate MERCURE_DEV_JWT (1 h)"
+secret="${MERCURE_SUBSCRIBER_JWT_KEY:-!ChangeThisMercureHubJWTSecretKey!}"
+now=$(date +%s)
+payload=$(php -r "echo json_encode([
+    'sub'=>'dev-subscriber',
+    'mercure'=>['subscribe'=>[
+        'https://rocket.chat/global',
+        'https://rocket.chat/team/*'
+    ]],
+    'iat'=>$now,
+    'exp'=>$now+3600
+]);")
+header='{"alg":"HS256","typ":"JWT"}'
+b64() { php -r "echo rtrim(strtr(base64_encode(stream_get_contents(STDIN)),'+/','-_'),'=');"; }
+
+token=$(printf '%s' "$header" | b64)
+token="$token.$(printf '%s' "$payload" | b64)"
+sig=$(printf '%s' "$token" | openssl dgst -sha256 -hmac "$secret" -binary | b64)
+token="$token.$sig"
+
+echo "MERCURE_DEV_JWT=$token" > .env.local
+echo "✅  .env.local créé"
+
+echo ""
+echo "🚀  READY"
+echo "   Web : http://127.0.0.1:8000"
+echo "   MailDev : http://127.0.0.1:1080"
+echo "   Mercure Hub UI : http://127.0.0.1:9090/.well-known/mercure/ui"
+echo ""
+echo "💬  Post a message :"
+echo "   php bin/console app:chat:post global  'Hello world'"
+echo "   php bin/console app:chat:post team/2  'Go team 2 !'"
+echo ""
+echo "📜  Live Mercure logs :  docker compose logs -f mercure-hub"
+echo ""
+echo "🖥️  Starting Symfony server in background …"
+symfony server:start -d --port=8000
+
+echo ""
+echo "🦊  Opening Firefox …"
+firefox http://127.0.0.1:8000 &

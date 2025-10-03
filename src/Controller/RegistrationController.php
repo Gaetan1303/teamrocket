@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Sbire;
+use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\TeamVilainRepository; 
 use App\Security\EmailVerifier;
@@ -31,7 +31,7 @@ class RegistrationController extends AbstractController
         TeamVilainRepository $teamVilainRepository 
     ): Response
     {
-        $user = new Sbire();
+        $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
@@ -75,7 +75,7 @@ class RegistrationController extends AbstractController
 
         // validate email confirmation link, sets User::isVerified=true and persists
         try {
-            /** @var Sbire $user */
+            /** @var User $user */
             $user = $this->getUser();
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
