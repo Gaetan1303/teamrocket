@@ -1,133 +1,17 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+        {% endblock %}
 
-{% block title %}Team Rocket - Accueil{% endblock %}
-
-{% block stylesheets %}
-{# Correction: Les balises link du favicon sont déplacées ici, dans le bloc 'stylesheets' qui se trouve dans <head> #}
-<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" referrerpolicy="no-referrer">
-<link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" referrerpolicy="no-referrer">
-
-<style>
-    :root {
-        --rocket-red: #cc0000;
-        --rocket-black: #0b0b0b;
-        --rocket-gray: #222;
-        --text-light: #eee;
-    }
-    body {
-        background: var(--rocket-black);
-        color: var(--text-light);
-        font-family: 'Roboto', sans-serif;
-    }
-    .hero {
-        background: linear-gradient(135deg, var(--rocket-red), #880000);
-        padding: 4rem 1rem;
-        text-align: center;
-    }
-    .hero h1 {
-        font-family: 'Wallpoet', cursive;
-        font-size: 3rem;
-        margin: 0;
-        text-shadow: 0 0 10px var(--rocket-red);
-    }
-    .hero p {
-        font-size: 1.2rem;
-        margin-top: 1rem;
-    }
-    .chat-section {
-        max-width: 800px;
-        margin: 2rem auto;
-        background: var(--rocket-gray);
-        border: 1px solid #444;
-        border-radius: 8px;
-        padding: 1rem;
-    }
-    .chat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    .chat-header h2 {
-        margin: 0;
-    }
-    .chat-list {
-        max-height: 300px;
-        overflow: auto;
-        padding: 0.5rem;
-    }
-    .chat-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem;
-        border-radius: 4px;
-        transition: background 120ms ease;
-    }
-    .chat-item:hover {
-        background: rgba(255,255,255,0.02);
-    }
-    .chat-item img {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-    }
-    .chat-form {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    .chat-input {
-        flex: 1;
-        padding: 0.5rem;
-        border-radius: 4px;
-        border: 1px solid #555;
-        background: #111;
-        color: #fff;
-    }
-    .chat-send {
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        border: none;
-        background: var(--rocket-red);
-        color: #fff;
-        cursor: pointer;
-    }
-    .chat-send:hover {
-        background: #ff3333;
-    }
-</style>
-{% endblock %}
-
-{% block body %}
-<div data-controller="chat"
-     data-chat-user-value="{{ app.user ? app.user.codename|e('js') : '' }}"
-     data-chat-mercure-url-value="{{ MERCURE_PUBLIC_URL|e('js') }}"
-     data-chat-teams-value='{{ teams|json_encode|raw }}'>
-
-    <section class="hero">
-        <h1>Team Rocket</h1>
-        <p>Recrutement de sbires en temps réel</p>
-    </section>
-
-    <section class="chat-section">
-        <div class="chat-header">
-            <h2>💬 Chat</h2>
-            <select data-chat-target="teamSelect" class="chat-select">
-                <option value="">Global</option>
-                {% for team in teams %}
-                    <option value="{{ team.id }}">{{ team.name }}</option>
-{% endfor %}
-            </select>
-        </div>
-
-        <div data-chat-target="list" class="chat-list"></div>
-
-        <form data-chat-target="form" data-action="submit->chat#send" class="chat-form">
-            <input data-chat-target="input" type="text" placeholder="Tapez votre message..." class="chat-input" />
-            <button type="submit" class="chat-send">Envoyer</button>
-        </form>
-    </section>
-
-</div>
-{% endblock %}
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>

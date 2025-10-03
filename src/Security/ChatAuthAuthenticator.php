@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use App\Repository\SbireRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ChatAuthAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private SbireRepository $sbireRepository)
+    public function __construct(private UserRepository $userRepository)
     {
     }
 
@@ -40,16 +40,16 @@ class ChatAuthAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('Invalid chat token');
         }
 
-        // Attempt to load the Sbire by codename
+        // Attempt to load the User by codename
         return new SelfValidatingPassport(
             new UserBadge($codename, function () use ($codename) {
-                $sbire = $this->sbireRepository->findOneBy(['codename' => $codename]);
+                $user = $this->userRepository->findOneBy(['codename' => $codename]);
 
-                if (!$sbire) {
+                if (!$user) {
                     throw new AuthenticationException('Unknown chat user');
                 }
 
-                return $sbire;
+                return $user;
             })
         );
     }

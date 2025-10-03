@@ -1,13 +1,10 @@
 when@dev:
-    
-web_profiler:
-    toolbar: true               # active la toolbar Symfony
- 
+    web_profiler:
+        toolbar: true
 
-framework:
-    profiler:
-        only_exceptions: false  # profiler actif pour toutes les requêtes, pas seulement les exceptions
-
+    framework:
+        profiler:
+            collect_serializer_data: true
 
 when@test:
     framework:

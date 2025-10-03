@@ -2,9 +2,9 @@
 
 namespace App\Tests\Functional;
 
-use App\Entity\Sbire;
+use App\Entity\User;
 use App\Repository\ChatRepository;
-use App\Repository\SbireRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
@@ -42,10 +42,10 @@ class ChatPublishTest extends WebTestCase
             $schemaTool->createSchema($meta);
         }
 
-        // Ensure we have a Sbire to authenticate with
-        $codename = 'test_sbire_' . random_int(1000, 9999);
+        // Ensure we have a User to authenticate with
+        $codename = 'test_user_' . random_int(1000, 9999);
 
-        $sbire = new Sbire();
+        $sbire = new User();
         $sbire->setEmail($codename . '@example.com')
             ->setCodename($codename)
             ->setPassword('not_used');

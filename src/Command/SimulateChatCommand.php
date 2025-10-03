@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Chat;
-use App\Entity\Sbire;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -40,13 +40,13 @@ class SimulateChatCommand extends Command
         $teamId = $input->getOption('team');
         $direct = (bool) $input->getOption('direct');
 
-        $repoSbire = $this->em->getRepository(Sbire::class);
+        $repoSbire = $this->em->getRepository(User::class);
 
         // Ensure there's at least one sbire to use
         $sbires = $repoSbire->findBy([], null, 5);
         if (empty($sbires)) {
             for ($i = 1; $i <= 3; $i++) {
-                $s = new Sbire();
+                $s = new User();
                 $s->setEmail("sim{$i}@example.com");
                 $s->setCodename("sim{$i}");
                 $s->setPassword('not_used');

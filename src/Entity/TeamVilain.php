@@ -28,7 +28,7 @@ class TeamVilain
     private ?string $colorCode = null;
 
     // ➜ propriété renommée en minuscule pour correspondre à mappedBy="teamVilain"
-    #[ORM\OneToMany(targetEntity: Sbire::class, mappedBy: 'teamVilain')]
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'teamVilain')]
     private Collection $sbires;
 
     public function __construct()
@@ -88,14 +88,14 @@ class TeamVilain
     }
 
     /**
-     * @return Collection<int, Sbire>
+     * @return Collection<int, User>
      */
     public function getSbires(): Collection
     {
         return $this->sbires;
     }
 
-    public function addSbire(Sbire $sbire): static
+    public function addSbire(User $sbire): static
     {
         if (!$this->sbires->contains($sbire)) {
             $this->sbires->add($sbire);
@@ -104,7 +104,7 @@ class TeamVilain
         return $this;
     }
 
-    public function removeSbire(Sbire $sbire): static
+    public function removeSbire(User $sbire): static
     {
         if ($this->sbires->removeElement($sbire)) {
             if ($sbire->getTeamVilain() === $this) {

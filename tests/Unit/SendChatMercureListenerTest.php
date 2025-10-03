@@ -24,10 +24,10 @@ class SendChatMercureListenerTest extends TestCase
                 return $update instanceof Update;
             }));
 
-    $sbireRepo = $this->createMock(\App\Repository\SbireRepository::class);
-    $sbireRepo->method('findOneBy')->willReturn(null);
+    $userRepo = $this->createMock(\App\Repository\UserRepository::class);
+    $userRepo->method('findOneBy')->willReturn(null);
 
-    $listener = new SendChatMercureListener($hub, $sbireRepo);
+    $listener = new SendChatMercureListener($hub, $userRepo);
 
         $event = new ChatMessageEvent($chat);
 
