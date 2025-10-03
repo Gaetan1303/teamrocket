@@ -1,13 +1,26 @@
 <?php
-// Usage: php bin/generate-mercure-jwt.php '!ChangeThisMercureHubJWTSecretKey!'
-$key = $argv[1] ?? getenv('MERCURE_PUBLISHER_JWT_KEY') ?? '!ChangeThisMercureHubJWTSecretKey!';
-$header = ['alg' => 'HS256', 'typ' => 'JWT'];
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+
+$key = $argv[1] ?? 'dev-secret-key';     // clé JWT passée en argument ou valeur par défaut
+$type = $argv[2] ?? 'publisher';         // 2e argument : "publisher" ou "subscriber"
+
+// Payload Mercure
 $payload = [
-    'mercure' => [ 'publish' => ['*'] ],
-    'iat' => time(),
-    'exp' => time() + 3600,
+    'mercure' => []
 ];
-function b64($data) { return rtrim(strtr(base64_encode($data), '+/', '-_'), '='); }
-$jwt = b64(json_encode($header)) . '.' . b64(json_encode($payload));
-$jwt .= '.' . b64(hash_hmac('sha256', $jwt, $key, true));
+
+if ($type === 'publisher') {
+    $payload['mercure']['publish'] = ['*'];   // autorise la publication sur tous les topics
+} elseif ($type === 'subscriber') {
+    $payload['mercure']['subscribe'] = ['*']; // autorise l'abonnement à tous les topics
+} else {
+    fwrite(STDERR, "Usage: php bin/generate-mercure-jwt.php <key> [publisher|subscriber]\n");
+    exit(1);
+}
+
+$jwt = JWT::encode($payload, $key, 'HS256');
+
 echo $jwt;

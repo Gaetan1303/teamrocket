@@ -1,46 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Chat {{ teamId ? 'Team #' ~ teamId : 'Global' }}{% endblock %}
-
 {% block body %}
-<div class="container mt-5">
-    <h1>💬 Chat {{ teamId ? 'Team' : 'Global' }}</h1>
+    <h1>Chat</h1>
 
-    <div id="messages" class="border rounded p-3 mb-3" style="height:300px; overflow-y:auto;"></div>
+    <script>
+        window.MERCURE_JWT = '{{ mercure_jwt }}';
+    </script>
 
-    <form id="chatForm" class="input-group">
-        <input type="text" id="msgInput" class="form-control" placeholder="Écris ton message">
-        <button class="btn btn-danger">Envoyer</button>
-    </form>
-</div>
+    <div data-controller="chat"
+         data-chat-mercure-url-value="{{ mercure_url }}">
+        <form data-action="submit->chat#sendMessage">
+            <input type="text" name="message" placeholder="Votre message">
+            <button type="submit">Envoyer</button>
+        </form>
 
-<script>
-const teamId = {{ teamId|json_encode|raw }};
-const topic = teamId
-    ? 'urn:teamrocket:chat:team/' + teamId
-    : 'urn:teamrocket:chat:global';
-
-const eventSource = new EventSource(
-    'http://localhost:9090/.well-known/mercure?topic=' + encodeURIComponent(topic)
-);
-
-const msgDiv = document.getElementById('messages');
-
-eventSource.onmessage = e => {
-    const m = JSON.parse(e.data);
-    msgDiv.innerHTML += `<div><b>${m.author}</b> <small>${m.time}</small><br/>${m.message}</div>`;
-    msgDiv.scrollTop = msgDiv.scrollHeight;
-};
-
-document.getElementById('chatForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('msgInput');
-    await fetch('/chat/send', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({teamId, message: input.value})
-    });
-    input.value = '';
-});
-</script>
+        <div data-chat-target="messages"></div>
+    </div>
 {% endblock %}

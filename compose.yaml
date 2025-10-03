@@ -1,52 +1,46 @@
-
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-php-app
+    ports:
+      - "8443:443"  # Apache HTTPS
+      - "8080:80"   # Apache HTTP
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - /home/billy/Team-Rocket/teamrocket:/var/www/html:cached
+      - ./docker/apache/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf:ro
+      - ./docker/php/conf.d/memory.ini:/usr/local/etc/php/conf.d/memory.ini
 
-###> symfony/mercure-bundle ###
+    environment:
+      APACHE_DOCUMENT_ROOT: /var/www/html/public
+    depends_on:
+      - database
+      - mercure
+    working_dir: /var/www/html
+    
+
+  database:
+    image: postgres:16-alpine
+    container_name: my-postgres
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: teamrocketforever
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
   mercure:
     image: dunglas/mercure
+    container_name: mercure-hub
     restart: unless-stopped
     environment:
-      # Uncomment the following line to disable HTTPS,
-      #SERVER_NAME: ':80'
       MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
       MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
-      # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
       MERCURE_EXTRA_DIRECTIVES: |
         cors_origins http://127.0.0.1:8000
-    healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost/healthz"]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    volumes:
-      - mercure_data:/data
-      - mercure_config:/config
-###< symfony/mercure-bundle ###
+    ports:
+      - "8081:80"
 
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
-
-###> symfony/mercure-bundle ###
-  mercure_data:
-  mercure_config:
-###< symfony/mercure-bundle ###

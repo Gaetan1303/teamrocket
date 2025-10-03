@@ -1,31 +1,31 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
 parameters:
-    env(MERCURE_PUBLIC_URL): ''
-
-twig:
-    globals:
-        MERCURE_PUBLIC_URL: '%env(MERCURE_PUBLIC_URL)%'
 
 services:
+    # Default configuration for services in *this* file
     _defaults:
-        autowire: true
-        autoconfigure: true
+        autowire: true      # Automatically injects dependencies
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $publisherJwt: '@=service("App\\Service\\MercureJwtFactory").createPublisherJwt()'
 
+    # Makes classes in src/ available to be used as services
+    # This creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    # Controllers are imported separately to make sure services can be injected
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    # Mercure JWT Factory with both keys
     App\Service\MercureJwtFactory:
         arguments:
-            $publisherJwtKey: '%env(MERCURE_PUBLISHER_JWT_KEY)%'
+            $publisherKey: '%env(MERCURE_PUBLISHER_JWT_KEY)%'
+            $subscriberKey: '%env(MERCURE_SUBSCRIBER_JWT_KEY)%'
 
-    App\:
-        resource: '../src/'
-
-    App\EventListener\ChatDoctrineListener:
-        tags:
-            - { name: doctrine.event_listener, event: postPersist }
-
+    # Listener Chat → Mercure
     App\EventListener\SendChatMercureListener:
         tags:
             - { name: kernel.event_listener, event: 'App\\Event\\ChatMessageEvent', method: onChatMessage }

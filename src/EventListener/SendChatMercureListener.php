@@ -1,52 +1,41 @@
 <?php
-
 namespace App\EventListener;
 
 use App\Event\ChatMessageEvent;
-use App\Repository\SbireRepository;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 
-final class SendChatMercureListener
+class SendChatMercureListener
 {
-    public function __construct(private HubInterface $hub, private SbireRepository $sbireRepository)
+    private HubInterface $hub;
+
+    public function __construct(HubInterface $hub)
     {
+        $this->hub = $hub;
     }
 
     public function onChatMessage(ChatMessageEvent $event): void
     {
-        $chat = $event->chat;
-        $team = $chat->getTeam();
+        // Récupération du message envoyé
+        $chat = $event->getChat();
 
-        $topic = $team
-            ? 'urn:teamrocket:chat:team/' . $team->getId()
-            : 'urn:teamrocket:chat:global';
+        // Définition du topic (canal Mercure)
+        $topic = 'urn:teamrocket:chat:global';
 
-        // try to enrich the payload with the Sbire email if available
-        $authorCodename = $chat->getAuthor();
-        $email = null;
-        if ($authorCodename) {
-            $sbire = $this->sbireRepository->findOneBy(['codename' => $authorCodename]);
-            if ($sbire) {
-                $email = $sbire->getEmail();
-            }
-        }
-
+        // Construction du payload JSON
         $payload = [
-            'id'      => $chat->getId(),
-            'author'  => $chat->getAuthor(),
+            'id' => $chat->getId(),
+            'user' => $chat->getUser()->getUsername(),
             'message' => $chat->getMessage(),
-            'time'    => $chat->getCreatedAt()->format('Y-m-d H:i:s'),
-            'teamId'  => $team ? $team->getId() : null,
+            'createdAt' => $chat->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
 
-        if ($email) {
-            $payload['email'] = $email;
-        }
-
-        $this->hub->publish(new Update(
+        // Publication sur Mercure
+        $update = new Update(
             $topic,
-            json_encode($payload)
-        ));
+            json_encode($payload, JSON_THROW_ON_ERROR)
+        );
+
+        $this->hub->publish($update);
     }
 }

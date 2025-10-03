@@ -1,31 +1,28 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\ChatRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: ChatRepository::class)]
+#[ORM\Table(name: 'chat')]
 class Chat
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: TeamVilain::class, inversedBy: 'chats')]
-    #[ORM\JoinColumn(nullable: true)] // null = chat global
-    private ?TeamVilain $team = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $author = null;
+    #[ORM\Column(type: 'text')]
+    private string $message;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $message = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $createdAt;
 
     public function __construct()
     {
@@ -37,45 +34,34 @@ class Chat
         return $this->id;
     }
 
-    public function getTeam(): ?TeamVilain
+    public function getUser(): ?User
     {
-        return $this->team;
+        return $this->user;
     }
 
-    public function setTeam(?TeamVilain $team): static
+    public function setUser(User $user): self
     {
-        $this->team = $team;
+        $this->user = $user;
         return $this;
     }
 
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(string $author): static
-    {
-        $this->author = $author;
-        return $this;
-    }
-
-    public function getMessage(): ?string
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    public function setMessage(string $message): static
+    public function setMessage(string $message): self
     {
         $this->message = $message;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;

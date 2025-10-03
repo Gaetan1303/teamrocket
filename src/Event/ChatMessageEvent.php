@@ -1,12 +1,22 @@
 <?php
-
 namespace App\Event;
 
 use App\Entity\Chat;
+use Symfony\Contracts\EventDispatcher\Event;
 
-final class ChatMessageEvent
+class ChatMessageEvent extends Event
 {
-    public function __construct(public readonly Chat $chat)
+    public const NAME = 'App\Event\ChatMessageEvent';
+
+    private Chat $chat;
+
+    public function __construct(Chat $chat)
     {
+        $this->chat = $chat;
+    }
+
+    public function getChat(): Chat
+    {
+        return $this->chat;
     }
 }

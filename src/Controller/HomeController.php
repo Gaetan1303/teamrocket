@@ -14,20 +14,26 @@ final class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(PokemonApiService $pokemonApiService, LoggerInterface $logger, TeamVilainRepository $teamRepo): Response
     {
-        $teams = $teamRepo->findAll();
+        // $teams = $teamRepo->findAll();
 
-        // Transform teams into a simple array for templates (avoid serializing entities)
-        $teamData = array_map(function($t){
-            return [
-                'id' => $t->getId(),
-                'name' => method_exists($t, 'getName') ? $t->getName() : (string) $t->getId(),
-            ];
-        }, $teams);
-
+        // // Transform teams into a simple array for templates (avoid serializing entities)
+        // $teamData = array_map(function($t){
+        //     return [
+        //         'id' => $t->getId(),
+        //         'name' => method_exists($t, 'getName') ? $t->getName() : (string) $t->getId(),
+        //     ];
+        // }, $teams);
+        
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
-            'teams' => $teams,
-            'teamData' => $teamData,
+            'controller_name' => 'HomeController'
+            // 'teams' => $teams,
+            // 'teamData' => $teamData,
         ]);
+    }
+
+    #[Route('/about', name: 'app_home_about')]
+    public function about(): Response
+    {
+        return new Response("about");
     }
 }

@@ -1,33 +1,34 @@
 <?php
 namespace App\Service;
 
+use Firebase\JWT\JWT;
+
 class MercureJwtFactory
 {
-    private string $secret;
+    private string $publisherKey;
+    private string $subscriberKey;
 
-    public function __construct(string $publisherJwtKey)
+    public function __construct(string $publisherKey, string $subscriberKey)
     {
-        $this->secret = $publisherJwtKey;
+        $this->publisherKey = $publisherKey;
+        $this->subscriberKey = $subscriberKey;
     }
 
     public function createPublisherJwt(): string
     {
-        $header = [
-            'alg' => 'HS256',
-            'typ' => 'JWT',
-        ];
         $payload = [
-            'mercure' => [
-                'publish' => ['*'],
-            ],
-            'mercure.publish' => ['*'],
-            'iat' => time(),
+            'mercure' => ['publish' => ['*']],
             'exp' => time() + 3600,
         ];
-        $base64UrlHeader = rtrim(strtr(base64_encode(json_encode($header)), '+/', '-_'), '=');
-        $base64UrlPayload = rtrim(strtr(base64_encode(json_encode($payload)), '+/', '-_'), '=');
-        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $this->secret, true);
-        $base64UrlSignature = rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
-        return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+        return JWT::encode($payload, $this->publisherKey, 'HS256');
+    }
+
+    public function createSubscriberJwt(): string
+    {
+        $payload = [
+            'mercure' => ['subscribe' => ['*']], // le client pourra s'abonner à tous les topics
+            'exp' => time() + 3600,
+        ];
+        return JWT::encode($payload, $this->subscriberKey, 'HS256');
     }
 }
