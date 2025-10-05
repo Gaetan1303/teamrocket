@@ -1,19 +1,41 @@
-{% extends 'base.html.twig' %}
+{# Fichier : templates/chat/index.html.twig #}
 
-{% block body %}
-    <h1>Chat</h1>
+<script>
+    // 1. Récupération des paramètres nécessaires depuis le contrôleur
+    const mercureUrl = '{{ mercure_url | e('js') }}';
+    const subscriberJwt = '{{ mercure_jwt | e('js') }}';
+    const topicToSubscribe = 'urn:teamrocket:chat:global'; 
 
-    <script>
-        window.MERCURE_JWT = '{{ mercure_jwt }}';
-    </script>
+    // 2. Construction de l'URL d'abonnement
+    const url = new URL(mercureUrl);
+    url.searchParams.append('topic', topicToSubscribe);
 
-    <div data-controller="chat"
-         data-chat-mercure-url-value="{{ mercure_url }}">
-        <form data-action="submit->chat#sendMessage">
-            <input type="text" name="message" placeholder="Votre message">
-            <button type="submit">Envoyer</button>
-        </form>
+    // Si vous utilisez une authentification (JWT) pour l'abonné:
+    // url.searchParams.append('Authorization', 'Bearer ' + subscriberJwt);
 
-        <div data-chat-target="messages"></div>
-    </div>
-{% endblock %}
+    // 3. Connexion au Hub Mercure via EventSource
+    const eventSource = new EventSource(url);
+
+    // 4. Gestion de la réception des messages
+    eventSource.onmessage = event => {
+        // Le `data` de l'événement contient le payload JSON que le listener PHP a envoyé
+        const update = JSON.parse(event.data);
+        
+        console.log('--- MESSAGE REÇU VIA MERCURE (SSE) ---');
+        console.log('ID:', update.id);
+        console.log('Utilisateur:', update.user);
+        console.log('Message:', update.message);
+        console.log('Heure:', update.createdAt);
+        console.log('------------------------------------');
+        
+        // C'est ici que vous inséreriez la logique pour ajouter le message au DOM
+    };
+
+    eventSource.onerror = event => {
+        console.error("Erreur EventSource:", event);
+        eventSource.close();
+    };
+
+    console.log(`Abonnement en cours au topic : ${topicToSubscribe}`);
+
+</script>

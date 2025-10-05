@@ -63,17 +63,23 @@ class SimulateChatCommand extends Command
             $message = sprintf('Simulated message #%d from %s', $i + 1, $author->getCodename());
 
             if ($direct) {
+                // Topic dynamique
                 $topic = $teamId ? 'urn:teamrocket:chat:team/' . $teamId : 'urn:teamrocket:chat:global';
+                
+                // Payload harmonisé avec SendChatMercureListener.php
+                $now = new \DateTimeImmutable();
                 $data = [
                     'id' => 'sim-' . uniqid(),
-                    'author' => $author->getCodename(),
+                    'user' => $author->getCodename(), // CLÉ HARMONISÉE
                     'message' => $message,
-                    'time' => (new \DateTimeImmutable())->format('H:i'),
+                    'createdAt' => $now->format('Y-m-d H:i:s'), // CLÉ ET FORMAT HARMONISÉS
                 ];
+                
                 $update = [
                     'topic' => $topic,
                     'data' => json_encode($data),
                 ];
+                
                 $ch = curl_init('http://localhost:9080/.well-known/mercure');
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($update));
@@ -93,10 +99,14 @@ class SimulateChatCommand extends Command
                 // persist a Chat so doctrine listener dispatches and the normal pipeline runs
                 $chat = new Chat();
                 if ($teamId) {
+                    // Importe l'entité TeamVilain
                     $team = $this->em->getRepository(\App\Entity\TeamVilain::class)->find($teamId);
                     if ($team) $chat->setTeam($team);
                 }
-                $chat->setAuthor($author->getCodename())
+                // NOTE: Dans le flux normal, l'auteur devrait être un objet User. 
+                // Ici, on utilise getCodename() pour la simulation, ce qui est cohérent 
+                // avec votre logique de test mais à adapter en production.
+                $chat->setAuthor($author->getCodename()) 
                     ->setMessage($message)
                     ->setCreatedAt(new \DateTimeImmutable());
                 $this->em->persist($chat);
