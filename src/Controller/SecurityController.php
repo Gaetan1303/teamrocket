@@ -2,30 +2,69 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    #[Route('/login', name: 'app_login', methods: ['GET'])]
+    public function login(): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
-
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('security/login.html.twig');
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
-    public function logout(): void
+    #[Route('/login', name: 'app_login_post', methods: ['POST'])]
+    public function loginPost(
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        UserRepository $userRepo,
+        CsrfTokenManagerInterface $csrfManager
+    ): RedirectResponse {
+        $email     = $request->request->get('email');
+        $password  = $request->request->get('password');
+        $csrfToken = $request->request->get('_csrf_token');
+
+        // 1. CSRF
+        if (!$csrfManager->isTokenValid(new CsrfToken('authenticate', $csrfToken))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // 2. Utilisateur
+        $user = $userRepo->findOneBy(['email' => $email]);
+        if (!$user) {
+            $this->addFlash('error', 'Identifiants incorrects.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // 3. Mot de passe
+        if (!$hasher->isPasswordValid($user, $password)) {
+            $this->addFlash('error', 'Identifiants incorrects.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // 4. Connexion manuelle
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $this->container->get('security.token_storage')->setToken($token);
+        $request->getSession()->set('_security_main', serialize($token));
+
+        // 5. Redirection
+        return $this->redirectToRoute('app_home');
+    }
+
+    #[Route('/logout', name: 'app_logout', methods: ['GET'])]
+    public function logout(Security $security): Response
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
