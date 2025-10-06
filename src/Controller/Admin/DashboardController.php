@@ -2,9 +2,16 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\User;
+use App\Entity\TeamVilain;
+use App\Entity\Chat; 
+use App\Entity\Pokemon;
+
+
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -13,38 +20,51 @@ class DashboardController extends AbstractDashboardController
 {
     public function index(): Response
     {
+        // Redirige vers la page d'accueil de l'administration ou la liste des utilisateurs par défaut.
         return parent::index();
-
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // 1.1) If you have enabled the "pretty URLs" feature:
-        // return $this->redirectToRoute('admin_user_index');
-        //
-        // 1.2) Same example but using the "ugly URLs" that were used in previous EasyAdmin versions:
+        // Alternative : Rediriger vers un CrudController spécifique
         // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator->setController(OneOfYourCrudController::class)->generateUrl());
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirectToRoute('...');
-        // }
-
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        // return $this->render('some/path/my-dashboard.html.twig');
+        // return $this->redirect($adminUrlGenerator->setController(UserCrudController::class)->generateUrl());
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Teamrocket');
+            ->setTitle('Teamrocket') // Le titre affiché dans le navigateur et l'entête
+            ->renderContentMaximized(); // Optionnel : pour maximiser l'espace de contenu
     }
 
+    /**
+     * Cette méthode définit les liens de navigation (menu) qui apparaissent dans la barre latérale.
+     */
     public function configureMenuItems(): iterable
     {
+        // 1. Lien principal vers le Dashboard
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+
+        // 2. Séparateur pour les entités (optionnel)
+        yield MenuItem::section('Gestion des Vilains', 'fa fa-user-secret');
+
+        // 3. Liens vers les CRUD Controllers
+        // Les Sbires (Utilisateurs)
+        yield MenuItem::linkToCrud('Sbires (Users)', 'fas fa-users', User::class)
+             ->setController(\App\Controller\Admin\UserCrudController::class); // Spécifier explicitement le CrudController
+
+        // Les Teams de Vilains
+        yield MenuItem::linkToCrud('Teams Vilains', 'fas fa-shield-alt', TeamVilain::class)
+             ->setController(\App\Controller\Admin\TeamVilainCrudController::class);
+
+        // 4. Autre Sections
+        yield MenuItem::section('Contenu & Divers', 'fa fa-list');
+
+        // Pokemon (si c'est une entité gérée)
+        yield MenuItem::linkToCrud('Pokémon', 'fas fa-paw', Pokemon::class)
+             ->setController(\App\Controller\Admin\PokemonCrudController::class);
+
+        // Chat (si c'est une entité gérée)
+        yield MenuItem::linkToCrud('Chats', 'fas fa-comments', Chat::class)
+             ->setController(\App\Controller\Admin\ChatCrudController::class);
+
+       
     }
 }

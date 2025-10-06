@@ -28,7 +28,7 @@ class MessageController extends AbstractController
     public function send(
         Request $request,
         EntityManagerInterface $em,
-        EventDispatcherInterface $dispatcher
+        
     ): Response {
         $user = $this->getUser();
         if (!$user) {
@@ -46,17 +46,18 @@ class MessageController extends AbstractController
         $chat->setMessage($content);
 
         // Persistance
+        // Le ChatDoctrineListener.php s'occupera de dispatcher le ChatMessageEvent après le flush.
         $em->persist($chat);
         $em->flush();
 
-        // Dispatch de l'événement → Mercure notifiera tous les abonnés
-        $dispatcher->dispatch(new ChatMessageEvent($chat), ChatMessageEvent::NAME);
+    
 
         return $this->json([
             'id' => $chat->getId(),
             'user' => $user->getUserIdentifier(),
             'message' => $chat->getMessage(),
-            'createdAt' => $chat->getCreatedAt()->format('Y-m-d H:i:s'),
+            // méthode getCreatedAt().
+            'createdAt' => $chat->getCreatedAt()->format('Y-m-d H:i:s'), 
         ]);
     }
 }

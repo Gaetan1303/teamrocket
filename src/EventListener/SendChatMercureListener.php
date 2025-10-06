@@ -20,12 +20,20 @@ class SendChatMercureListener
         $chat = $event->getChat();
 
         // Définition du topic (canal Mercure)
-        $topic = 'urn:teamrocket:chat:global';
+        if (null !== $chat->getTeam()) {
+            // Topic spécifique à l'équipe
+            // Ceci suppose que $chat->getTeam() renvoie un objet avec getId() (ex: TeamVilain)
+            $topic = 'urn:teamrocket:chat:team/' . $chat->getTeam()->getId();
+        } else {
+            // Topic global par défaut
+            $topic = 'urn:teamrocket:chat:global';
+        }
 
         // Construction du payload JSON
         $payload = [
             'id' => $chat->getId(),
-            'user' => $chat->getUser()->getUsername(),
+            // On utilise getUserIdentifier() ou getUsername() en fonction de l'implémentation de votre User
+            'user' => $chat->getUser()->getUserIdentifier(), 
             'message' => $chat->getMessage(),
             'createdAt' => $chat->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
