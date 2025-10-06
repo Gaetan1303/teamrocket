@@ -1,41 +1,79 @@
-{# Fichier : templates/chat/index.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Chat global</title>
+    <style>
+        #messages {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 6px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat global</h1>
 
-<script>
-    // 1. Récupération des paramètres nécessaires depuis le contrôleur
-    const mercureUrl = '{{ mercure_url | e('js') }}';
-    const subscriberJwt = '{{ mercure_jwt | e('js') }}';
-    const topicToSubscribe = 'urn:teamrocket:chat:global'; 
+    <div id="messages"></div>
 
-    // 2. Construction de l'URL d'abonnement
-    const url = new URL(mercureUrl);
-    url.searchParams.append('topic', topicToSubscribe);
+    <form id="chat-form">
+        <input id="chat-input" type="text" placeholder="Votre message…" autocomplete="off" required>
+        <button type="submit">Envoyer</button>
+    </form>
 
-    // Si vous utilisez une authentification (JWT) pour l'abonné:
-    // url.searchParams.append('Authorization', 'Bearer ' + subscriberJwt);
+    <script>
+        /* 1. Variables injectées par Symfony */
+        const mercureUrl    = '{{ mercure_url|e('js') }}';
+        const subscriberJwt = '{{ mercure_jwt|e('js') }}';
+        const topic         = 'urn:teamrocket:chat:global';
 
-    // 3. Connexion au Hub Mercure via EventSource
-    const eventSource = new EventSource(url);
+        /* 2. Cookie pour authentifier le flux SSE */
+        document.cookie = 'mercureAuthorization=' + subscriberJwt +
+                          '; path=/.well-known/mercure' +
+                          '; secure; samesite=strict';
 
-    // 4. Gestion de la réception des messages
-    eventSource.onmessage = event => {
-        // Le `data` de l'événement contient le payload JSON que le listener PHP a envoyé
-        const update = JSON.parse(event.data);
-        
-        console.log('--- MESSAGE REÇU VIA MERCURE (SSE) ---');
-        console.log('ID:', update.id);
-        console.log('Utilisateur:', update.user);
-        console.log('Message:', update.message);
-        console.log('Heure:', update.createdAt);
-        console.log('------------------------------------');
-        
-        // C'est ici que vous inséreriez la logique pour ajouter le message au DOM
-    };
+        /* 3. Construction URL SSE */
+        const url = new URL(mercureUrl);
+        url.searchParams.append('topic', topic);
 
-    eventSource.onerror = event => {
-        console.error("Erreur EventSource:", event);
-        eventSource.close();
-    };
+        /* 4. Connexion SSE */
+        const es = new EventSource(url, { withCredentials: true });
 
-    console.log(`Abonnement en cours au topic : ${topicToSubscribe}`);
+        const box = document.getElementById('messages');
 
-</script>
+        /* 5. Affichage des messages entrants */
+        es.onmessage = e => {
+            const m = JSON.parse(e.data);
+            const line = document.createElement('div');
+            line.innerHTML = `<strong>${m.user}</strong> <em>${m.createdAt}</em><br>${m.message}`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        };
+
+        es.onerror = err => {
+            console.warn('SSE erreur – reconnexion dans 5 s', err);
+            es.close();
+            setTimeout(() => location.reload(), 5000);
+        };
+
+        console.log('Abonné au topic : ' + topic);
+
+        /* 6. Envoi de nouveaux messages (optionnel) */
+        document.getElementById('chat-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const msg   = input.value.trim();
+            if (!msg) return;
+
+            await fetch('/chat/send', {
+                method : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body   : JSON.stringify({ message: msg })
+            });
+            input.value = '';
+        });
+    </script>
+</body>
+</html>

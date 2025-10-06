@@ -5,9 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
 
-    <!-- Polices & icônes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root{
@@ -22,7 +20,7 @@
         }
 
         .enrol-card{
-            position:relative;width:100%;max-width:480px;
+            width:100%;max-width:480px;
             background:rgba(0,0,0,.65);border:2px solid var(--clr-primary);
             border-radius:16px;padding:2.5rem;box-shadow:0 0 20px rgba(139,0,0,.5);
             animation:fadeIn .8s ease-out;
@@ -75,7 +73,7 @@
 <div class="enrol-card">
     <h1 class="enrol-title">ENVOLEZ-VOUS VERS LE MAL</h1>
 
-    {{ form_start(registrationForm) }}
+    {{ form_start(registrationForm, {'attr': {'data-turbo': 'false'}}) }} <!-- PAS DE TURBO -->
 
         <!-- Email -->
         <div class="form-group">
@@ -128,29 +126,32 @@
 {% block javascripts %}
     {{ parent() }}
 
-    <script>
-        /* Mise à jour visuelle au changement de team */
-        const select   = document.getElementById('team-select');
-        const logo     = document.getElementById('team-logo-select');
-        const name     = document.getElementById('team-name-select');
-        const credo    = document.getElementById('team-credo-select');
+    <script defer>
+        /* Attendre le DOM + sécuriser l’existence du champ */
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.getElementById('team-select');
+            const logo   = document.getElementById('team-logo-select');
+            const name   = document.getElementById('team-name-select');
+            const credo  = document.getElementById('team-credo-select');
 
-        /* Données injectées côté serveur (JSON valide) */
-        const teams = {{ teamsDetails|json_encode|raw }};
+            if (!select) return; // ← pas d’erreur si absent
 
-        function updateTeamDisplay(id){
-            const t = teams.find(x => x.id == id);
-            if (!t) return;
+            const teams = {{ teamsDetails|json_encode|raw }};
 
-            logo.textContent               = t.name.charAt(0).toUpperCase();
-            logo.style.backgroundColor     = t.colorCode;
-            logo.style.borderColor         = t.colorCode;
-            name.textContent               = t.name;
-            credo.textContent              = t.credo;
-        }
+            function updateTeamDisplay(id){
+                const t = teams.find(x => x.id == id);
+                if (!t) return;
 
-        select.addEventListener('change', () => updateTeamDisplay(select.value));
-        updateTeamDisplay(select.value); // initial
+                logo.textContent           = t.name.charAt(0).toUpperCase();
+                logo.style.backgroundColor = t.colorCode;
+                logo.style.borderColor     = t.colorCode;
+                name.textContent           = t.name;
+                credo.textContent          = t.credo;
+            }
+
+            select.addEventListener('change', () => updateTeamDisplay(select.value));
+            updateTeamDisplay(select.value); // initial
+        });
     </script>
 {% endblock %}
 
