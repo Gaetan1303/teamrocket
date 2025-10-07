@@ -59,7 +59,9 @@
 </head>
 
 <body>
-{% block body %}{% endblock %}
+{% block body %}
+
+{% endblock %}
 
 {% block footer %}
 <footer>
@@ -76,7 +78,7 @@
 </footer>
 {% endblock %}
 
-{% block javascripts %}
+{% block javascripts %} 
     {% block importmap %}{{ importmap('app') }}{% endblock %}
 {% endblock %}
 </body>

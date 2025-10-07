@@ -31,37 +31,5 @@ class DashboardController extends AbstractDashboardController
             ->renderContentMaximized();
     }
 
-    /**
-     * Cette méthode définit les liens de navigation (menu) qui apparaissent dans la barre latérale.
-     */
-    public function configureMenuItems(): iterable
-    {
-        // 1. Lien principal vers le Dashboard
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-
-        // 2. Séparateur pour les entités 
-        yield MenuItem::section('Gestion des Vilains', 'fa fa-user-secret');
-
-        // 3. Liens vers les CRUD Controllers
-        // Les Sbires (Utilisateurs)
-        yield MenuItem::linkToCrud('Sbires (Users)', 'fas fa-users', User::class)
-             ->setController(\App\Controller\Admin\UserCrudController::class); 
-
-        // Les Teams de Vilains
-        yield MenuItem::linkToCrud('Teams Vilains', 'fas fa-shield-alt', TeamVilain::class)
-             ->setController(\App\Controller\Admin\TeamVilainCrudController::class);
-
-        // 4. Autre Sections
-        yield MenuItem::section('Contenu & Divers', 'fa fa-list');
-
-        // Pokemon
-        yield MenuItem::linkToCrud('Pokémon', 'fas fa-paw', Pokemon::class)
-             ->setController(\App\Controller\Admin\PokemonCrudController::class);
-
-        // Chat 
-        yield MenuItem::linkToCrud('Chats', 'fas fa-comments', Chat::class)
-             ->setController(\App\Controller\Admin\ChatCrudController::class);
-
-       
-    }
+   
 }
