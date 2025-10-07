@@ -72,25 +72,22 @@
 <div class="login-card">
     <h1 class="login-title">CONNEXION</h1>
 
-    {% if error %}
-        <div class="alert alert-danger">
-            {{ error.messageKey|trans(error.messageData, 'security') }}
-        </div>
-    {% endif %}
+    {% for flash in app.flashes('error') %}
+        <div class="alert alert-danger">{{ flash }}</div>
+    {% endfor %}
 
-    <form method="post">
+    <form id="loginForm" data-turbo="false">
         <div class="form-group">
             <label for="inputEmail" class="form-label">Adresse e-mail</label>
-            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+            <input type="email" name="email" id="inputEmail" class="form-control" required autofocus>
         </div>
 
         <div class="form-group">
             <label for="inputPassword" class="form-label">Mot de passe</label>
-            <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+            <input type="password" name="password" id="inputPassword" class="form-control" required>
         </div>
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
         <button class="btn-login" type="submit">SE CONNECTER</button>
     </form>
 
@@ -100,6 +97,33 @@
 </div>
 {% endblock %}
 
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const data = new URLSearchParams({
+        email: document.getElementById('inputEmail').value,
+        password: document.getElementById('inputPassword').value,
+        _csrf_token: document.querySelector('input[name="_csrf_token"]').value
+    });
+
+    const res = await fetch('{{ path('app_login_post') }}', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: data
+    });
+
+    if (res.ok && res.redirected) {
+        window.location.href = res.url;
+    } else {
+        location.reload(); 
+    }
+});
+</script>
+{% endblock %}
+
 {% block footer %}
-    
 {% endblock %}

@@ -1,21 +1,84 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Chat;
 use App\Service\MercureJwtFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ChatController extends AbstractController
 {
-    #[Route('/chat', name: 'chat_index')]
+    #[Route('/chat', name: 'chat_index', methods: ['GET'])]
     public function index(MercureJwtFactory $jwtFactory): Response
     {
         $subscriberJwt = $jwtFactory->createSubscriberJwt();
 
         return $this->render('chat/index.html.twig', [
             'mercure_jwt' => $subscriberJwt,
-            'mercure_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:9080/.well-known/mercure',
+            'mercure_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'https://localhost/.well-known/mercure',
         ]);
+    }
+
+    #[Route('/chat/history', name: 'chat_history', methods: ['GET'])]
+    public function history(EntityManagerInterface $em): JsonResponse
+    {
+        $messages = $em->getRepository(Chat::class)
+            ->createQueryBuilder('c')
+            ->select('c.id, c.message, c.createdAt, u.username as user')
+            ->leftJoin('c.user', 'u')
+            ->orderBy('c.createdAt', 'ASC')
+            ->setMaxResults(50)
+            ->getQuery()
+            ->getResult();
+
+        return new JsonResponse($messages);
+    }
+
+    #[Route('/chat/send', name: 'chat_send', methods: ['POST'])]
+    public function send(
+        Request $request,
+        HubInterface $hub,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $content = trim($data['message'] ?? '');
+
+        if (!$content) {
+            return new JsonResponse(['error' => 'Message vide'], 400);
+        }
+
+        $chat = new Chat();
+        $chat->setMessage($content);
+        $chat->setCreatedAt(new \DateTimeImmutable());
+        $chat->setUser($this->getUser()); // null si anonyme
+
+        $em->persist($chat);
+        $em->flush();
+
+        $update = new Update(
+            'urn:teamrocket:chat:global',
+            json_encode([
+                'id' => $chat->getId(),
+                'user' => $this->getUser()?->getUserIdentifier() ?? 'Anonyme',
+                'message' => $chat->getMessage(),
+                'createdAt' => $chat->getCreatedAt()->format('Y-m-d H:i:s'),
+            ])
+        );
+        $hub->publish($update);
+
+        return new JsonResponse(['status' => 'published']);
+    }
+
+    #[Route('/chat/clear', name: 'chat_clear', methods: ['DELETE'])]
+    public function clear(EntityManagerInterface $em): JsonResponse
+    {
+        $em->createQuery('DELETE FROM App\Entity\Chat')->execute();
+        return new JsonResponse(['status' => 'cleared']);
     }
 }

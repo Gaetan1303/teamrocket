@@ -1,11 +1,72 @@
-<p>Bonjour {{ user.codename ?? user.email }},</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmez votre adresse e-mail – Team Rocket & Co</title>
 
-<p>Merci de vous être inscrit·e. Veuillez confirmer votre adresse email en cliquant sur le lien ci-dessous :</p>
+    <!-- Polices -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-<p><a href="{{ signedUrl }}">Confirmer mon adresse email</a></p>
+    <style>
+        :root{
+            --clr-bg:#0b0b0b;--clr-primary:#8b0000;--clr-secondary:#111;
+            --clr-text:#f0f0f0;--clr-accent:#ffcc00;
+            --ff-body:'Roboto',sans-serif;--ff-title:'Orbitron',sans-serif;
+        }
+        body{
+            background:var(--clr-bg);color:var(--clr-text);
+            font-family:var(--ff-body);margin:0;padding:40px 20px;
+            display:flex;justify-content:center;align-items:center;min-height:100vh;
+        }
+        .mail-card{
+            max-width:600px;width:100%;
+            background:rgba(0,0,0,.75);border:2px solid var(--clr-primary);
+            border-radius:16px;padding:2.5rem;box-shadow:0 0 20px rgba(139,0,0,.5);
+        }
+        .mail-title{
+            font-family:var(--ff-title);font-size:1.6rem;text-align:center;
+            margin-bottom:1.5rem;color:var(--clr-accent);text-shadow:0 0 6px var(--clr-accent);
+        }
+        .mail-text{line-height:1.6;margin-bottom:1rem}
+        .mail-button{
+            display:inline-block;margin:1.5rem 0;
+            background:var(--clr-primary);color:#fff;
+            font-family:var(--ff-title);font-size:1rem;font-weight:700;
+            padding:.9rem 2rem;border-radius:8px;text-decoration:none;
+            transition:background .3s,box-shadow .3s;
+            box-shadow:0 5px 15px rgba(139,0,0,.4);
+        }
+        .mail-button:hover{background:#ffcc00;color:#000;box-shadow:0 8px 25px rgba(255,204,0,.6)}
 
-<p>Ce lien expirera {{ expiresAtMessageKey|default('')|trans(expiresAtMessageData|default({}), 'VerifyEmailBundle') }}.</p>
+        .mail-footer{
+            margin-top:2rem;font-size:.8rem;color:#aaa;text-align:center;
+        }
+    </style>
+</head>
 
-<p>Si vous n'avez pas demandé cet email, vous pouvez l'ignorer.</p>
+<body>
+    <div class="mail-card">
+        <h1 class="mail-title">CONFIRMATION REQUISE</h1>
 
-<p>— L'équipe Team Rocket</p>
+        <p class="mail-text">
+            Bonjour {{ user.codename ?? user.email }},
+        </p>
+        <p class="mail-text">
+            Merci de vous être enrôlé‧e. Cliquez sur le bouton ci-dessous pour valider votre adresse e-mail :
+        </p>
+
+        <a href="{{ signedUrl }}" class="mail-button">CONFIRMER MON EMAIL</a>
+
+        <p class="mail-text">
+            Ce lien expirera dans {{ expiresAtMessageKey|default('')|trans(expiresAtMessageData|default({}), 'VerifyEmailBundle') }}.
+        </p>
+        <p class="mail-text">
+            Si vous n’avez pas demandé cet email, ignorez-le simplement.
+        </p>
+
+        <div class="mail-footer">
+            — L’équipe Team Rocket
+        </div>
+    </div>
+</body>
+</html>
