@@ -32,6 +32,6 @@ class FileCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->disable(Action::NEW, Action::EDIT); // on ne créé/édite pas un File
+            ->disable(Action::NEW, Action::EDIT); 
     }
 }

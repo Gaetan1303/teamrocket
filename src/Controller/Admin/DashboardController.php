@@ -78,7 +78,6 @@ class DashboardController extends AbstractDashboardController
             'newUserUrl' => $newUserUrl,
             'newPokemonUrl' => $newPokemonUrl,
         ]);
-        // return $this->redirectToRoute('admin_chat_index');
     }
 
     public function configureDashboard(): Dashboard
