@@ -17,8 +17,8 @@ class Sbire
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
-    #[ORM\Column(length: 50)]
-    private string $picture = 'rocket-m-1.png';
+    #[ORM\Column(length: 100)]
+    private string $picture = 'assets/images/characters/default-homme.png';
 
     #[ORM\Column(length: 7)]
     private string $color = '#000000';
@@ -35,7 +35,6 @@ class Sbire
     #[ORM\Column(type: 'smallint')]
     private int $speed = 1;
 
-    /* ---------- getters / setters ---------- */
     public function getId(): ?int { return $this->id; }
     public function getUser(): User { return $this->user; }
     public function setUser(User $user): self { $this->user = $user; return $this; }

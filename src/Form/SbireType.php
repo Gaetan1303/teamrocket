@@ -1,5 +1,5 @@
 <?php
-# src/Form/SbireType.php
+// src/Form/SbireType.php
 namespace App\Form;
 
 use App\Entity\Sbire;
@@ -7,72 +7,133 @@ use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\RangeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class SbireType extends AbstractType
 {
-    public function __construct(private Security $security){}
+    private Security $security;
+    private ParameterBagInterface $params;
 
-    private function picturesForTeam(?string $teamCode): array
+    public function __construct(Security $security, ParameterBagInterface $params)
     {
-        $pool = [
-            'rocket' => [
-                'rocket-m-1.png' => 'Rocket M 1',
-                'rocket-f-1.png' => 'Rocket F 1',
-                'rocket-m-2.png' => 'Rocket M 2',
-                'rocket-f-2.png' => 'Rocket F 2',
-            ],
-            'aqua'   => [
-                'aqua-m-1.png'   => 'Aqua M 1',
-                'aqua-f-1.png'   => 'Aqua F 1',
-            ],
-            'magma'  => [
-                'magma-m-1.png'  => 'Magma M 1',
-                'magma-f-1.png'  => 'Magma F 1',
-            ],
-        ];
-        return $pool[$teamCode] ?? $pool['rocket'];
+        $this->security = $security;
+        $this->params   = $params;
     }
 
+    /* -------------------------------------------------- */
+    /* buildForm                                          */
+    /* -------------------------------------------------- */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var User $user */
         $user = $this->security->getUser();
-        $team = $user?->getTeamVilain()?->getCode(); // "rocket"|"aqua"|"magma"
+        $base = 'assets/images/characters/';
 
-        $pictures = $this->picturesForTeam($team);
+        /* ******  HOMME / FEMME POUR SA TEAM UNIQUEMENT  ****** */
+        $team       = $user?->getTeamVilain();
+        $prefix     = $team ? str_replace(' ', '-', strtolower($team->getName())) : 'default';
+        $root       = $this->params->get('kernel.project_dir') . '/public/' . $base;
+        $hommePath  = $base . $prefix . '-homme.png';
+        $femmePath  = $base . $prefix . '-femme.png';
+        $hasHomme   = file_exists($root . $prefix . '-homme.png');
+        $hasFemme   = file_exists($root . $prefix . '-femme.png');
 
+        // On crée **toujours** deux options
+        $teamChoices = [];
+        if ($hasHomme) {
+            $teamChoices['Homme'] = $hommePath;
+        } else {
+            $teamChoices['Homme'] = $hasFemme ? $femmePath : $base.'default-homme.png';
+        }
+        if ($hasFemme) {
+            $teamChoices['Femme'] = $femmePath;
+        } else {
+            $teamChoices['Femme'] = $hasHomme ? $hommePath : $base.'default-femme.png';
+        }
+
+        /* ****  DEBUG  (à retirer en prod)  **** */
+        dump([
+            'team'   => $team?->getName(),
+            'prefix' => $prefix,
+            'hasH'   => $hasHomme,
+            'hasF'   => $hasFemme,
+            'choices'=> $teamChoices,
+        ]);
+        /* *************************************** */
+
+        /* ******  FORMULAIRE  ****** */
         $builder
-            ->add('picture', ChoiceType::class, [
-                'choices'      => $pictures,
-                'expanded'     => true,
-                'multiple'     => false,
-                'label'        => 'Apparence',
-                'data'         => array_key_first($pictures), // <- valeur par défaut
-                'attr'         => ['class' => 'picture-choices'],
+            ->add('avatarType', ChoiceType::class, [
+                'label'    => 'Type d\'avatar',
+                'choices'  => [
+                    'Avatar par défaut'   => 'default',
+                    'Avatar de team'      => 'team',
+                    'Avatar personnalisé' => 'custom',
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'data'     => 'default',
+                'mapped'   => false,
+            ])
+            ->add('defaultAvatar', ChoiceType::class, [
+                'label'    => 'Avatar par défaut',
+                'choices'  => [
+                    'Homme' => $base.'default-homme.png',
+                    'Femme' => $base.'default-femme.png',
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'data'     => $base.'default-homme.png',
+                'required' => false,
+                'mapped'   => false,
+            ])
+            ->add('teamAvatar', ChoiceType::class, [
+                'label'    => 'Avatar de team',
+                'choices'  => $teamChoices,
+                'expanded' => true,
+                'multiple' => false,
+                'required' => false,
+                'mapped'   => false,
+            ])
+            ->add('customAvatar', FileType::class, [
+                'label'       => 'Uploader ton avatar',
+                'mapped'      => false,
+                'required'    => false,
+                'constraints' => [
+                    new File([
+                        'maxSize'   => '2M',
+                        'mimeTypes' => ['image/jpeg','image/png','image/gif','image/webp'],
+                        'mimeTypesMessage' => 'Formats acceptés : JPEG, PNG, GIF, WEBP uniquement.',
+                    ])
+                ],
             ])
             ->add('color', ColorType::class, [
                 'label' => 'Couleur dominante',
-                'data'  => '#000000', // <- valeur par défaut
-                'attr'  => ['class' => 'color-picker'],
+                'data'  => '#000000',
             ])
             ->add('power', RangeType::class, [
                 'label' => 'Puissance (1-10)',
-                'attr'  => ['min' => 1, 'max' => 10, 'class' => 'stat-range'],
+                'attr'  => ['min' => 1, 'max' => 10],
             ])
             ->add('defense', RangeType::class, [
                 'label' => 'Défense (1-10)',
-                'attr'  => ['min' => 1, 'max' => 10, 'class' => 'stat-range'],
+                'attr'  => ['min' => 1, 'max' => 10],
             ])
             ->add('speed', RangeType::class, [
                 'label' => 'Vitesse (1-10)',
-                'attr'  => ['min' => 1, 'max' => 10, 'class' => 'stat-range'],
+                'attr'  => ['min' => 1, 'max' => 10],
             ]);
     }
 
+    /* -------------------------------------------------- */
+    /* configureOptions                                   */
+    /* -------------------------------------------------- */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
