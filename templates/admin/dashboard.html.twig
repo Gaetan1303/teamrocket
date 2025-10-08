@@ -1,0 +1,97 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Dashboard · TeamRocket{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+
+    <h2>Tableau de bord TeamRocket</h2>
+
+    <!-- Cartes de stats -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span class="num">{{ stats.users }}</span>
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\UserCrudController') }}">Utilisateurs</a>
+        </div>
+        <div class="stat-card">
+            <span class="num">{{ stats.pokemons }}</span>
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\PokemonCrudController') }}">Pokémon</a>
+        </div>
+        <div class="stat-card">
+            <span class="num">{{ stats.teams }}</span>
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\TeamVilainCrudController') }}">Équipes</a>
+        </div>
+        <div class="stat-card">
+            <span class="num">{{ stats.messages }}</span>
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\ChatCrudController') }}">Messages</a>
+        </div>
+    </section>
+
+    <!-- Actions rapides -->
+    <section class="quick-actions">
+        <a href="{{ newUserUrl }}" class="btn-primary">+ Nouvel utilisateur</a>
+        <a href="{{ newPokemonUrl }}" class="btn-primary">+ Nouveau Pokémon</a>
+    </section>
+
+    <!-- Deux listes côte à côte -->
+    <section class="lists-row">
+        <div class="list-block">
+            <h3>5 derniers inscrits</h3>
+            <ul>
+                {% for u in lastUsers %}
+                    <li>
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\UserCrudController').setAction('detail').setEntityId(u.id) }}">
+                            {{ u.codename }} ({{ u.email }})
+                        </a>
+                    </li>
+                {% else %}
+                    <li>Aucun utilisateur</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="list-block">
+            <h3>5 derniers Pokémon capturés</h3>
+            <ul>
+                {% for p in lastCaught %}
+                    <li>
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\PokemonCrudController').setAction('detail').setEntityId(p.id) }}">
+                            {{ p.name }} (#{{ p.apiId }})
+                        </a>
+                    </li>
+                {% else %}
+                    <li>Aucun Pokémon capturé</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <!-- Graphique -->
+    <section class="chart-block">
+        <h3>Répartition des Pokémon par statut</h3>
+        <canvas id="statusChart" width="400" height="200"></canvas>
+    </section>
+
+</div>
+
+{# <!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+const ctx = document.getElementById('statusChart');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: {{ statusStats|keys|json_encode|raw }},
+    datasets: [{
+      label: 'Quantité',
+      data: {{ statusStats|map(v => v)|json_encode|raw }},
+      backgroundColor: ['#4CAF50','#2196F3','#FF9800']
+    }]
+  },
+  options: {
+    plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}
+  }
+});#}
+</script>
+{% endblock %}

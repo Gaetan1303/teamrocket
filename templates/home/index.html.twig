@@ -95,21 +95,12 @@
 {% block body %}
 <body class="dark-universe">
 
-<!-- Bannière -->
-<section class="poke-banner">
-    <h1>Rejoignez les Teams Pokémon</h1>
-    <nav class="poke-nav">
-      {% if app.user %}
-        <span class="nav-welcome">Salut, <strong>{{ app.user.codename }}</strong></span>
-        <a href="{{ path('app_logout') }}" class="btn-nav">Déconnexion</a>
-      {% else %}
-        <a href="{{ path('app_login') }}"  class="btn-nav">Connexion</a>
-        <a href="{{ path('app_register') }}" class="btn-nav">S’inscrire</a>
-      {% endif %}
-    </nav>
-</section>
-
-<!-- Scrolling credos -->
+<nav class="poke-nav">
+  {% if app.user %}
+    <span class="nav-welcome"> <strong>{{ app.user.teamVilain.name }}</strong></span>
+    <a href="{{ path('app_sbire_create') }}" class="btn-nav">Avatar</a>
+  {% endif %}
+</nav>
 <div class="scrolling-credo">
     <div>
         {% for team in teams %}
@@ -142,13 +133,6 @@
         </div>
     {% endfor %}
 </section>
-
-</body>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-
     <!-- Typewriter : écrit lettre par lettre -->
     <script>
         document.addEventListener('DOMContentLoaded',()=>{
@@ -163,6 +147,13 @@
             },40);
         });
     </script>
+</body>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+
 {% endblock %}
 
 {% block footer %}

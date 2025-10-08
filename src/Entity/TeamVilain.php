@@ -27,7 +27,9 @@ class TeamVilain
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $colorCode = null;
 
-    // ➜ propriété renommée en minuscule pour correspondre à mappedBy="teamVilain"
+    #[ORM\Column(length: 20, unique: true)]
+    private ?string $code = null;               
+
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'teamVilain')]
     private Collection $sbires;
 
@@ -84,6 +86,17 @@ class TeamVilain
     public function setColorCode(?string $colorCode): static
     {
         $this->colorCode = $colorCode;
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
         return $this;
     }
 

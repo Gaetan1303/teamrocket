@@ -1,6 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Connexion – Team Rocket & Co{% endblock %}
+{% block navigation %}
+  <nav class="mini-nav">
+    <a href="{{ path('app_home') }}">Retour</a>
+  </nav>
+{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -90,15 +95,10 @@
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
         <button class="btn-login" type="submit">SE CONNECTER</button>
     </form>
-
     <div class="extra-links">
         <a href="{{ path('app_register') }}">Pas encore enrôlé ?</a>
     </div>
 </div>
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
 <script>
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -123,6 +123,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
 });
 </script>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
 {% endblock %}
 
 {% block footer %}
