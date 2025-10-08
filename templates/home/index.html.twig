@@ -95,9 +95,9 @@
 {% block body %}
 <body class="dark-universe">
 
-<!-- Bannière -->
+{# <!-- Bannière -->
 <section class="poke-banner">
-    <h1>Rejoignez les Teams Pokémon</h1>
+    <h1>Rejoignez les Teams de Vilains</h1>
     <nav class="poke-nav">
       {% if app.user %}
         <span class="nav-welcome">Salut, <strong>{{ app.user.codename }}</strong></span>
@@ -107,7 +107,7 @@
         <a href="{{ path('app_register') }}" class="btn-nav">S’inscrire</a>
       {% endif %}
     </nav>
-</section>
+</section> #}
 
 <!-- Scrolling credos -->
 <div class="scrolling-credo">
@@ -142,13 +142,6 @@
         </div>
     {% endfor %}
 </section>
-
-</body>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-
     <!-- Typewriter : écrit lettre par lettre -->
     <script>
         document.addEventListener('DOMContentLoaded',()=>{
@@ -163,6 +156,13 @@
             },40);
         });
     </script>
+</body>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+
 {% endblock %}
 
 {% block footer %}
