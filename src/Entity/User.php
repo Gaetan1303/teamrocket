@@ -49,12 +49,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(options: ["default" => false])]
     private bool $hasDoneFirstTheft = false;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Sbire::class, cascade: ['persist', 'remove'])]
+    private ?Sbire $sbire = null;
+
     public function __construct()
     {
         $this->uuid = \Symfony\Component\Uid\Uuid::v4()->toRfc4122();
     }
 
-    // -------- getters & setters --------
+    /* -------------------- getters & setters -------------------- */
 
     public function getId(): ?int
     {
@@ -159,9 +162,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->starterPokemon;
     }
 
-    public function setStarterPokemon(?string $starter): static
+    public function setStarterPokemon(?string $starterPokemon): static
     {
-        $this->starterPokemon = $starter;
+        $this->starterPokemon = $starterPokemon;
         return $this;
     }
 
@@ -170,9 +173,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->starterPokemonId;
     }
 
-    public function setStarterPokemonId(?int $id): static
+    public function setStarterPokemonId(?int $starterPokemonId): static
     {
-        $this->starterPokemonId = $id;
+        $this->starterPokemonId = $starterPokemonId;
         return $this;
     }
 
@@ -181,9 +184,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->hasDoneFirstTheft;
     }
 
-    public function setHasDoneFirstTheft(bool $done): static
+    public function setHasDoneFirstTheft(bool $hasDoneFirstTheft): static
     {
-        $this->hasDoneFirstTheft = $done;
+        $this->hasDoneFirstTheft = $hasDoneFirstTheft;
+        return $this;
+    }
+
+    public function getSbire(): ?Sbire
+    {
+        return $this->sbire;
+    }
+
+    public function setSbire(?Sbire $sbire): static
+    {
+        $this->sbire = $sbire;
+        if ($sbire !== null) {
+            $sbire->setUser($this);
+        }
         return $this;
     }
 }

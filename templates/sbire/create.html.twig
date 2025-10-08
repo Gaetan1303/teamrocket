@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block footer %}{# vide = pas de footer #}{% endblock %}
+
+{% block title %}Création du sbire{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center"
+     style="background-color: {{ team.colorCode }}20;">
+  <div class="bg-white rounded-2xl shadow-lg p-8 max-w-4xl w-full">
+    <h1 class="text-2xl font-bold mb-6 text-center">
+      Personnalise ton sbire {{ team.name }} !
+    </h1>
+
+    {{ form_start(form, { attr: { 'class': 'space-y-6' } }) }}
+
+    <div class="grid md:grid-cols-2 gap-6">
+      {# aperçu #}
+      <div class="flex flex-col items-center">
+        <img id="sbire-preview"
+             src="{{ asset('images/avatars/' ~ form.vars.value.picture) }}"
+             class="rounded-xl border-4 w-64"
+             style="border-color: {{ form.vars.value.color }}">
+      </div>
+
+      {# champs #}
+      <div class="space-y-4">
+        {{ form_row(form.picture) }}
+        {{ form_row(form.color) }}
+
+        <div class="border-t pt-4">
+          <p class="text-sm font-medium mb-2">Répartition des points</p>
+          {{ form_row(form.power) }}
+          {{ form_row(form.defense) }}
+          {{ form_row(form.speed) }}
+        </div>
+
+        <button class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+          Valider mon sbire
+        </button>
+      </div>
+    </div>
+
+    {{ form_end(form) }}
+  </div>
+</div>
+
+<script>
+/* aperçu live */
+document.querySelectorAll('input[name="sbire[picture]"]').forEach(radio => {
+  radio.addEventListener('change', e => {
+    document.getElementById('sbire-preview').src = "{{ asset('images/avatars/') }}" + e.target.value;
+  });
+});
+document.getElementById('sbire_color').addEventListener('input', e => {
+  document.getElementById('sbire-preview').style.borderColor = e.target.value;
+});
+</script>
+{% endblock %}
