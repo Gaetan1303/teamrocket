@@ -1,161 +1,275 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Team Rocket & Co – Recrutement Ultime{% endblock %}
+{% block title %}Team Rocket & Co – Recrutement Ultime
+{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
+	{{ parent() }}
 
-    <!-- Police style Pokémon -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<!-- Police style Pokémon -->
+	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root{
-            --rocket:#8B3A3A; --aqua:#2563EB; --magma:#DC2626; --galaxie:#4B0082;
-            --plasma:#FFFFFF; --flare:#FF4500; --skull:#6B7280; --aether:#10B981;
-            --rainbow:#000; --star:#F59E0B;
-            --clr-primary:#ffcc00; --clr-accent:#ffcc00;
-        }
+	<style>:root
+	{
+		--rocket: #8B3A3A;
+		--aqua: #2563EB;
+		--magma: #DC2626;
+		--galaxie: #4B0082;
+		--plasma: #FFFFFF;
+		--flare: #FF4500;
+		--skull: #6B7280;
+		--aether: #10B981;
+		--rainbow: #000;
+		--star: #F59E0B;
+		--clr-primary: #ffcc00;
+		--clr-accent: #ffcc00;
+	}
 
-        /* ---------- Banner + nav ---------- */
-        .poke-banner{
-            display:flex; align-items:center; justify-content:space-between;
-            padding:2rem 3rem; background:#111; border-bottom:3px solid var(--clr-primary);
-        }
-        .poke-banner h1{
-            font-family:'Orbitron',sans-serif; font-size:2.2rem; color:var(--clr-primary);
-            text-shadow:0 0 6px var(--clr-primary);
-        }
-        .poke-nav{display:flex; align-items:center; gap:1rem; font-family:'Orbitron',sans-serif;}
-        .btn-nav{
-            padding:.55rem 1.1rem; border:2px solid var(--clr-primary);
-            background:rgba(0,0,0,.55); color:var(--clr-primary);
-            border-radius:6px; text-decoration:none; transition:.3s;
-            box-shadow:0 0 6px var(--clr-primary);
-        }
-        .btn-nav:hover{background:var(--clr-primary); color:#000;}
-        .nav-welcome{color:#fff; margin-right:.5rem;}
+	/* ---------- Banner + nav ---------- */
+	.poke-banner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 2rem 3rem;
+		background: #111;
+		border-bottom: 3px solid var(--clr-primary);
+	}
+	.poke-banner h1 {
+		font-family: 'Orbitron', sans-serif;
+		font-size: 2.2rem;
+		color: var(--clr-primary);
+		text-shadow: 0 0 6px var(--clr-primary);
+	}
+	.poke-nav {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-family: 'Orbitron', sans-serif;
+	}
+	.btn-nav {
+		padding: 0.55rem 1.1rem;
+		border: 2px solid var(--clr-primary);
+		background: rgba(0, 0, 0, .55);
+		color: var(--clr-primary);
+		border-radius: 6px;
+		text-decoration: none;
+		transition: 0.3s;
+		box-shadow: 0 0 6px var(--clr-primary);
+	}
+	.btn-nav:hover {
+		background: var(--clr-primary);
+		color: #000;
+	}
+	.nav-welcome {
+		color: #fff;
+		margin-right: 0.5rem;
+	}
 
-        /* ---------- Scrolling credos ---------- */
-        .scrolling-credo{
-            overflow:hidden; white-space:nowrap; background:#000;
-            border-top:3px solid var(--clr-primary); border-bottom:3px solid var(--clr-primary);
-            padding:1rem 0; font-family:'Orbitron',sans-serif; font-size:1.1rem; letter-spacing:1px;
-            color:var(--clr-accent); text-shadow:0 0 4px var(--clr-accent);
-        }
-        .scrolling-credo div{display:inline-block; padding-left:100%; animation:scroll-left 60s linear infinite}
-        @keyframes scroll-left{to{transform:translateX(-100%)}}
-        .scrolling-credo span{margin-right:5rem;}
+	/* ---------- Scrolling credos ---------- */
+	.scrolling-credo {
+		overflow: hidden;
+		white-space: nowrap;
+		background: #000;
+		border-top: 3px solid var(--clr-primary);
+		border-bottom: 3px solid var(--clr-primary);
+		padding: 1rem 0;
+		font-family: 'Orbitron', sans-serif;
+		font-size: 1.1rem;
+		letter-spacing: 1px;
+		color: var(--clr-accent);
+		text-shadow: 0 0 4px var(--clr-accent);
+	}
+	.scrolling-credo div {
+		display: inline-block;
+		padding-left: 100%;
+		animation: scroll-left 60s linear infinite
+	}
+	@keyframes scroll-left {
+		to {
+			transform: translateX(-100%)
+		}
+	}
+	.scrolling-credo span {
+		margin-right: 5rem;
+	}
 
-        /* ---------- CTA cellule unique animée ---------- */
-        .cta-cell{display:grid; place-content:center; padding:4rem 1rem}
-        .dialog-box{
-            position:relative; background:rgba(0,0,0,.75); border:3px solid var(--clr-primary);
-            border-radius:12px; padding:2rem 3rem; max-width:600px; text-align:center;
-            box-shadow:0 0 12px var(--clr-primary), inset 0 0 8px var(--clr-primary);
-            animation:borderPulse 2s infinite;
-        }
-        @keyframes borderPulse{
-            0%,100%{box-shadow:0 0 12px var(--clr-primary), inset 0 0 8px var(--clr-primary);}
-            50%{box-shadow:0 0 20px #ffcc00, inset 0 0 12px #ffcc00;}
-        }
-        .typewriter{
-            font-family:'Orbitron',sans-serif; font-size:1.3rem; color:var(--clr-accent); min-height:3.2rem;
-        }
-        .typewriter.typing::after{content:'▌'; animation:blink 1s infinite}
-        @keyframes blink{50%{opacity:0}}
-        .btn-cta{
-            display:inline-block; margin-top:1.5rem; background:var(--clr-primary); color:#fff;
-            font-size:1.1rem; font-weight:bold; padding:.9rem 2rem; border:none; border-radius:8px;
-            box-shadow:0 0 8px rgba(255,204,0,.5); animation:pulseBtn 1.5s infinite; transition:.3s;
-        }
-        .btn-cta:hover{transform:translateY(-2px); box-shadow:0 0 15px #ffcc00;}
-        @keyframes pulseBtn{
-            0%,100%{transform:scale(1)}50%{transform:scale(1.05)}
-        }
+	/* ---------- CTA cellule unique animée ---------- */
+	.cta-cell {
+		display: grid;
+		place-content: center;
+		padding: 4rem 1rem
+	}
+	.dialog-box {
+		position: relative;
+		background: rgba(0, 0, 0, .75);
+		border: 3px solid var(--clr-primary);
+		border-radius: 12px;
+		padding: 2rem 3rem;
+		max-width: 600px;
+		text-align: center;
+		box-shadow: 0 0 12px var(--clr-primary), inset 0 0 8px var(--clr-primary);
+		animation: borderPulse 2s infinite;
+	}
+	@keyframes borderPulse {
+		0,
+		100% {
+			box-shadow: 0 0 12px var(--clr-primary), inset 0 0 8px var(--clr-primary);
+		}
+		50% {
+			box-shadow: 0 0 20px #ffcc00, inset 0 0 12px #ffcc00;
+		}
+	}
+	.typewriter {
+		font-family: 'Orbitron', sans-serif;
+		font-size: 1.3rem;
+		color: var(--clr-accent);
+		min-height: 3.2rem;
+	}
+	.typewriter.typing::after {
+		content: '▌';
+		animation: blink 1s infinite
+	}
+	@keyframes blink {
+		50% {
+			opacity: 0
+		}
+	}
+	.btn-cta {
+		display: inline-block;
+		margin-top: 1.5rem;
+		background: var(--clr-primary);
+		color: #fff;
+		font-size: 1.1rem;
+		font-weight: bold;
+		padding: 0.9rem 2rem;
+		border: none;
+		border-radius: 8px;
+		box-shadow: 0 0 8px rgba(255, 204, 0, .5);
+		animation: pulseBtn 1.5s infinite;
+		transition: 0.3s;
+	}
+	.btn-cta:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 0 15px #ffcc00;
+	}
+	@keyframes pulseBtn {
+		0,
+		100% {
+			transform: scale(1)
+		}
+		50% {
+			transform: scale(1.05)
+		}
+	}
 
-        /* ---------- Section détails teams ---------- */
-        .teams-detail{padding:4rem 0; background:url('https://cdn.discordapp.com/attachments/734765451639050313/1027313662284560504/unknown.png') center/cover fixed}
-        .team-card{
-            position:relative; display:flex; align-items:center; gap:1.5rem;
-            background:rgba(0,0,0,.55); border:3px solid; border-radius:16px;
-            padding:1.5rem; margin-bottom:2rem; transition:.3s; overflow:hidden;
-        }
-        .team-card:hover{transform:scale(1.02); box-shadow:0 0 20px var(--c),0 0 40px var(--c)}
-        .team-logo{
-            width:80px; height:80px; border-radius:50%; display:grid; place-content:center;
-            font-family:'Orbitron',sans-serif; font-size:2.5rem; font-weight:700; color:#fff;
-            border:4px solid var(--c); background:var(--c); transition:.3s;
-        }
-        .team-name{font-family:'Orbitron',sans-serif; font-size:1.5rem; margin-bottom:.25rem}
-        .team-region{font-size:.9rem; opacity:.8}
-        .team-credo{font-style:italic; margin-top:.5rem}
-    </style>
-{% endblock %}
-
-{% block body %}
+	/* ---------- Section détails teams ---------- */
+	.teams-detail {
+		padding: 4rem 0;
+		background: url('https://cdn.discordapp.com/attachments/734765451639050313/1027313662284560504/unknown.png') center/cover fixed
+	}
+	.team-card {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		background: rgba(0, 0, 0, .55);
+		border: 3px solid;
+		border-radius: 16px;
+		padding: 1.5rem;
+		margin-bottom: 2rem;
+		transition: 0.3s;
+		overflow: hidden;
+	}
+	.team-card:hover {
+		transform: scale(1.02);
+		box-shadow: 0 0 20px var(--c), 0 0 40px var(--c)
+	}
+	.team-logo {
+		width: 80px;
+		height: 80px;
+		object-fit: contain;
+		border-radius: 50%;
+		background: #fff; /* fond blanc si transparence */
+		border: 4px solid var(--c);
+		padding: 6px;
+		transition: 0.3s;
+	}
+	.team-name {
+		font-family: 'Orbitron', sans-serif;
+		font-size: 1.5rem;
+		margin-bottom: 0.25rem
+	}
+	.team-region {
+		font-size: 0.9rem;
+		opacity: .8
+	}
+	.team-credo {
+		font-style: italic;
+		margin-top: 0.5rem
+	}
+</style>{% endblock %}{% block body %}
 <body class="dark-universe">
 
-<nav class="poke-nav">
-  {% if app.user %}
-    <span class="nav-welcome"> <strong>{{ app.user.teamVilain.name }}</strong></span>
-    <a href="{{ path('app_sbire_create') }}" class="btn-nav">Avatar</a>
-  {% endif %}
-</nav>
-<div class="scrolling-credo">
-    <div>
-        {% for team in teams %}
-            <span>« {{ team.credo }} »</span>
-        {% endfor %}
-    </div>
-</div>
+	<nav class="poke-nav">
+		{% if app.user %}
+			<span class="nav-welcome">
+				<strong>{{ app.user.teamVilain.name }}</strong>
+			</span>
+			<a href="{{ path('app_sbire_create') }}" class="btn-nav">Avatar</a>
+		{% endif %}
+	</nav>
+	<div class="scrolling-credo">
+		<div>
+			{% for team in teams %}
+				<span>«
+					{{ team.credo }}
+					»</span>
+			{% endfor %}
+		</div>
+	</div>
 
-<!-- CTA cellule unique animée -->
-<section class="cta-cell">
-    <div class="dialog-box">
-        <p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
-        <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
-    </div>
-</section>
+	<!-- CTA cellule unique animée -->
+	<section class="cta-cell">
+		<div class="dialog-box">
+			<p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
+			<a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
+		</div>
+	</section>
 
-<!-- Section détails par team -->
-<section class="teams-detail container">
-    <h3 class="text-center mb-5" style="font-family:'Orbitron',sans-serif;">Index des organisations criminelles</h3>
+	<!-- Section détails par team -->
+	<section class="teams-detail container">
+		<h3 class="text-center mb-5" style="font-family:'Orbitron',sans-serif;">Index des organisations criminelles</h3>
+		{# début de la boucle teams #}
+		{% for team in teams %}
 
-    {% for team in teams %}
-        {% set c = team.colorCode %}
-        <div class="team-card" style="--c:{{ c }};border-color:{{ c }};">
-            <div class="team-logo" style="background:{{ c }};border-color:{{ c }};">{{ team.name|first|upper }}</div>
-            <div class="team-info">
-                <div class="team-name" style="color:{{ c }};">{{ team.name }}</div>
-                <div class="team-region">Région : {{ team.region }}</div>
-                <div class="team-credo">« {{ team.credo }} »</div>
-            </div>
-        </div>
-    {% endfor %}
-</section>
-    <!-- Typewriter : écrit lettre par lettre -->
-    <script>
-        document.addEventListener('DOMContentLoaded',()=>{
-            const p=document.querySelector('.typewriter');
-            if(!p)return;
-            const text=p.dataset.text;
-            p.classList.add('typing');
-            let i=0;
-            const interval=setInterval(()=>{
-                p.textContent+=text[i++];
-                if(i===text.length)clearInterval(interval);
-            },40);
-        });
-    </script>
-</body>
-{% endblock %}
+			{# normalisation du nom de fichier #}
+			{% set filename = team.name|lower|replace({' ':'-', 'é':'e', 'è':'e', 'æ':'ae'}) ~ '.png' %}
 
-{% block javascripts %}
-    {{ parent() }}
+			<img src="{{ asset('assets/images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
 
+			<div class="team-info">
+				<div class="team-name" style="color:{{ team.colorCode }};">{{ team.name }}</div>
+				<div class="team-region">Région :
+					{{ team.region }}</div>
+				<div class="team-credo">«
+					{{ team.credo }}
+					»</div>
+			</div>
+		</div>
+	{% endfor %}
+</body></section><!-- Typewriter : écrit lettre par lettre --><script>
+document.addEventListener('DOMContentLoaded', () => {
+const p = document.querySelector('.typewriter');
+if (! p) 
+return;
 
-{% endblock %}
+const text = p.dataset.text;
+p.classList.add('typing');
+let i = 0;
+const interval = setInterval(() => {
+p.textContent += text[i++];
+if (i === text.length) 
+clearInterval(interval);
 
-{% block footer %}
-    {{ parent() }}
-{% endblock %}
+}, 40);
+});</script></body>{% endblock %}{% block javascripts %}{{ parent() }}{% endblock %}{% block footer %}{{ parent() }}{% endblock %}
