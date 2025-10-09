@@ -4,45 +4,79 @@
 {% block title %}Création du sbire{% endblock %}
 
 {% block body %}
-<div class="min-h-screen flex items-center justify-center" style="background-color: {{ team.colorCode }}20;">
-  <div class="bg-white rounded-2xl shadow-lg p-8 max-w-4xl w-full">
-    <h1 class="text-2xl font-bold mb-6 text-center">Personnalise ton sbire {{ team.name }} !</h1>
+<style>
+/* 1. Range + chiffre sur la même ligne */
+.stat-line{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+}
+.stat-line input[type=range]{flex:1}
+.stat-line .val{
+    font-weight:600;
+    min-width:2ch;
+    text-align:right;
+}
 
-    {{ form_start(form, { attr: { 'class': 'space-y-6', 'enctype': 'multipart/form-data' } }) }}
+/* 2. Fallback grille 2 colonnes si Tailwind absent */
+@media (min-width:768px){
+  .grid-cols-2-fix{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:2rem;
+  }
+}
+</style>
 
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="flex flex-col items-center">
-        <img id="sbire-preview"
-             src="{{ asset('images/characters/default-homme.png') }}"
-             class="rounded-xl border-4 w-64"
-             style="border-color: {{ form.vars.value.color }}">
-      </div>
+<div class="min-h-screen flex items-center justify-center"
+     style="background-color:{{ team.colorCode }}20;">
+  <div class="bg-white rounded-2xl shadow-lg p-8 max-w-5xl w-full">
 
+    <h1 class="text-2xl font-bold mb-6 text-center">
+        Personnalise ton sbire {{ team.name }} !
+    </h1>
+
+    {{ form_start(form, { attr: { 'class':'space-y-6', 'enctype':'multipart/form-data' } }) }}
+
+    {# Grille 2 colonnes : gauche formulaire, droite image #}
+    <div class="grid-cols-2-fix md:grid md:grid-cols-2 gap-8 items-start">
+      {# COLONNE GAUCHE : formulaire complet #}
       <div class="space-y-4">
         {{ form_row(form.avatarType) }}
 
         <div id="default-avatar-section" class="avatar-section">
           {{ form_row(form.defaultAvatar) }}
         </div>
-
-        <div id="team-avatar-section" class="avatar-section" style="display:none;">
+        <div id="team-avatar-section" class="avatar-section" style="display:none">
           {{ form_row(form.teamAvatar) }}
         </div>
-
-        <div id="custom-avatar-section" class="avatar-section" style="display:none;">
+        <div id="custom-avatar-section" class="avatar-section" style="display:none">
           {{ form_row(form.customAvatar) }}
         </div>
 
         {{ form_row(form.color) }}
 
-        <div class="border-t pt-4">
+        <div class="border-t pt-4 space-y-3">
           <p class="text-sm font-medium mb-2">Répartition des points</p>
-          {{ form_row(form.power) }}
-          {{ form_row(form.defense) }}
-          {{ form_row(form.speed) }}
+          {% for field in [form.power, form.defense, form.speed] %}
+          <div class="stat-line">
+            {{ form_widget(field, { attr: { 'data-stat':field.vars.name } }) }}
+            <span class="val">{{ field.vars.value|default(5) }}</span>
+          </div>
+          {% endfor %}
         </div>
 
-        <button class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">Valider mon sbire</button>
+        <button class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+          Valider mon sbire
+        </button>
+      </div>
+
+      {# COLONNE DROITE : image seule #}
+      <div class="flex flex-col items-center justify-center">
+        <img id="sbire-preview"
+             src="{{ asset('images/characters/default-homme.png') }}"
+             class="rounded-xl border-4 w-72 h-72 object-cover"
+             style="border-color:{{ form.vars.value.color }}">
       </div>
     </div>
 
@@ -52,41 +86,48 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const preview  = document.getElementById('sbire-preview');
     const typeRadios = document.querySelectorAll('input[name="sbire[avatarType]"]');
-    const preview = document.getElementById('sbire-preview');
 
-    function toggleSections() {
+    /* --- gestion des sections avatar --- */
+    function toggleSections(){
         const type = document.querySelector('input[name="sbire[avatarType]"]:checked').value;
         document.querySelectorAll('.avatar-section').forEach(s => s.style.display = 'none');
-        if (type === 'default') document.getElementById('default-avatar-section').style.display = 'block';
-        if (type === 'team')   document.getElementById('team-avatar-section').style.display = 'block';
-        if (type === 'custom') document.getElementById('custom-avatar-section').style.display = 'block';
+        if(type==='default') document.getElementById('default-avatar-section').style.display='block';
+        if(type==='team')    document.getElementById('team-avatar-section').style.display='block';
+        if(type==='custom')  document.getElementById('custom-avatar-section').style.display='block';
     }
-
-    function updatePreview(radio) {
-        if (radio) preview.src = "/" + radio.value.replace(/^\/+/, '');
-    }
-
     typeRadios.forEach(r => r.addEventListener('change', toggleSections));
+    toggleSections();
 
-    document.querySelectorAll('input[name="sbire[defaultAvatar]"], input[name="sbire[teamAvatar]"]').forEach(radio => {
-        radio.addEventListener('change', () => updatePreview(radio));
-    });
+    /* --- preview image --- */
+    function updatePreview(radio){
+        if(radio) preview.src = "/" + radio.value.replace(/^\/+/, '');
+    }
+    document.querySelectorAll('input[name="sbire[defaultAvatar]"], input[name="sbire[teamAvatar]"]')
+            .forEach(radio => radio.addEventListener('change', () => updatePreview(radio)));
 
     document.getElementById('sbire_customAvatar').addEventListener('change', e => {
         const file = e.target.files[0];
-        if (file) {
+        if(file){
             const reader = new FileReader();
-            reader.onload = e => preview.src = e.target.result;
+            reader.onload = ev => preview.src = ev.target.result;
             reader.readAsDataURL(file);
         }
     });
 
+    /* --- couleur bordure --- */
     document.getElementById('sbire_color').addEventListener('input', e => {
         preview.style.borderColor = e.target.value;
     });
 
-    toggleSections();
+    /* --- MAJ chiffre stats en temps réel --- */
+    document.querySelectorAll('.stat-line input[type=range]').forEach(slider => {
+        const output = slider.nextElementSibling;
+        const update = () => output.textContent = slider.value;
+        slider.addEventListener('input', update);
+        update(); // init
+    });
 });
 </script>
 {% endblock %}
