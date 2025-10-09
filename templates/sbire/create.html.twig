@@ -12,7 +12,10 @@
 
     <div class="grid md:grid-cols-2 gap-6">
       <div class="flex flex-col items-center">
-        <img id="sbire-preview" src="{{ asset('assets/images/characters/default-homme.png') }}" class="rounded-xl border-4 w-64" style="border-color: {{ form.vars.value.color }}">
+        <img id="sbire-preview"
+             src="{{ asset('images/characters/default-homme.png') }}"
+             class="rounded-xl border-4 w-64"
+             style="border-color: {{ form.vars.value.color }}">
       </div>
 
       <div class="space-y-4">
@@ -56,12 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const type = document.querySelector('input[name="sbire[avatarType]"]:checked').value;
         document.querySelectorAll('.avatar-section').forEach(s => s.style.display = 'none');
         if (type === 'default') document.getElementById('default-avatar-section').style.display = 'block';
-        if (type === 'team') document.getElementById('team-avatar-section').style.display = 'block';
+        if (type === 'team')   document.getElementById('team-avatar-section').style.display = 'block';
         if (type === 'custom') document.getElementById('custom-avatar-section').style.display = 'block';
     }
 
     function updatePreview(radio) {
-        if (radio) preview.src = "{{ asset('') }}" + radio.value;
+        if (radio) preview.src = "/" + radio.value.replace(/^\/+/, '');
     }
 
     typeRadios.forEach(r => r.addEventListener('change', toggleSections));

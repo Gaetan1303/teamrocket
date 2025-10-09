@@ -1,0 +1,128 @@
+:root {
+    --clr-bg:#4F0606;
+    --clr-primary:#8b0000;
+    --clr-secondary:#111;
+    --clr-text:#f0f0f0;
+    --clr-accent:#ffcc00;
+    --ff-body:'Press Start 2P',cursive;
+    --fw-body:400;
+    --lh-body:1.6;
+
+    /* Grille rétro
+    --clr-grid:#1c1c1c; 
+    --grid-size: 25px; */
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--clr-bg);
+    color: var(--clr-text);
+    font-family: var(--ff-body);
+    line-height: var(--lh-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    background-image:
+        linear-gradient(to right, var(--clr-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--clr-grid) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+    background-color: var(--clr-bg); 
+    position: relative;
+    z-index: 1;
+}
+
+/* Scanlines */
+body::before {
+    content: "";
+    position: fixed; 
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999; 
+    background: 
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.04), 
+            rgba(0,0,0,0.2) 1px,   
+            transparent 2px
+        );
+    background-size: 100% 4px; 
+    opacity: 0.3; 
+    animation: moveScanlines 5s linear infinite;
+}
+@keyframes moveScanlines {
+    from { background-position-y: 0; }
+    to   { background-position-y: 4px; }
+}
+
+a {
+    color: var(--clr-accent);
+    text-decoration: none;
+}
+a:hover {
+    color: #fff;
+}
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* ---------- navbar visuelle (même style que index) ---------- */
+.poke-banner {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    padding: 2rem 3rem; 
+    background: #111; 
+    border-bottom: 3px solid var(--clr-accent);
+}
+.poke-banner h1 {
+    font-family: 'Orbitron', sans-serif; 
+    font-size: 2.2rem; 
+    color: var(--clr-accent);
+    text-shadow: 0 0 6px var(--clr-accent);
+}
+.poke-nav {
+    display: flex; 
+    align-items: center; 
+    gap: 1rem; 
+    font-family: 'Orbitron', sans-serif;
+}
+.btn-nav {
+    padding: .55rem 1.1rem; 
+    border: 2px solid var(--clr-accent);
+    background: rgba(0,0,0,.55); 
+    color: var(--clr-accent);
+    border-radius: 6px; 
+    text-decoration: none; 
+    transition: .3s;
+    box-shadow: 0 0 6px var(--clr-accent);
+}
+.btn-nav:hover {
+    background: var(--clr-accent); 
+    color: #000;
+}
+.nav-welcome {
+    color: #fff; 
+    margin-right: .5rem;
+}
+
+/* Footer */
+footer {
+    background: #000;
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 2px solid var(--clr-primary);
+    margin-top: auto;
+}
+.target-pkm {
+    width: 100px;
+    image-rendering: pixelated;
+}

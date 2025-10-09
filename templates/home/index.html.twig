@@ -5,7 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/index.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -44,7 +44,7 @@
         {% for team in teams %}
             {% set filename = team.name|lower|replace({' ':'-', 'é':'e', 'è':'e', 'æ':'ae'}) ~ '.png' %}
             <div class="team-card" style="--c:{{ team.colorCode }};">
-                <img src="{{ asset('assets/images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
+                <img src="{{ asset('/images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
                 <div class="team-info">
                     <div class="team-name" style="color:{{ team.colorCode }};">{{ team.name }}</div>
                     <div class="team-region">Région : {{ team.region }}</div>

@@ -33,7 +33,7 @@ class SbireType extends AbstractType
     {
         /** @var User $user */
         $user = $this->security->getUser();
-        $base = 'assets/images/characters/';
+        $base = '/images/characters/';
 
         /* ******  HOMME / FEMME POUR SA TEAM UNIQUEMENT  ****** */
         $team       = $user?->getTeamVilain();
