@@ -228,13 +228,17 @@
 		</div>
 	</div>
 
-	<!-- CTA cellule unique animée -->
-	<section class="cta-cell">
-		<div class="dialog-box">
-			<p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
-			<a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
-		</div>
-	</section>
+	{# --------- CTA : visible UNIQUEMENT si NON connecté --------- #}
+{% if not app.user %}
+    <section class="cta-cell">
+        <div class="dialog-box">
+            <p class="typewriter" 
+               data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp.">
+            </p>
+            <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
+        </div>
+    </section>
+{% endif %}
 
 	<!-- Section détails par team -->
 	<section class="teams-detail container">
