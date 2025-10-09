@@ -1,31 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block footer %}{# vide = pas de footer #}{% endblock %}
-
+{% block footer %}{% endblock %}
 {% block title %}Création du sbire{% endblock %}
 
 {% block body %}
-<div class="min-h-screen flex items-center justify-center"
-     style="background-color: {{ team.colorCode }}20;">
+<div class="min-h-screen flex items-center justify-center" style="background-color: {{ team.colorCode }}20;">
   <div class="bg-white rounded-2xl shadow-lg p-8 max-w-4xl w-full">
-    <h1 class="text-2xl font-bold mb-6 text-center">
-      Personnalise ton sbire {{ team.name }} !
-    </h1>
+    <h1 class="text-2xl font-bold mb-6 text-center">Personnalise ton sbire {{ team.name }} !</h1>
 
-    {{ form_start(form, { attr: { 'class': 'space-y-6' } }) }}
+    {{ form_start(form, { attr: { 'class': 'space-y-6', 'enctype': 'multipart/form-data' } }) }}
 
     <div class="grid md:grid-cols-2 gap-6">
-      {# aperçu #}
       <div class="flex flex-col items-center">
-        <img id="sbire-preview"
-             src="{{ asset('images/avatars/' ~ form.vars.value.picture) }}"
-             class="rounded-xl border-4 w-64"
-             style="border-color: {{ form.vars.value.color }}">
+        <img id="sbire-preview" src="{{ asset('assets/images/characters/default-homme.png') }}" class="rounded-xl border-4 w-64" style="border-color: {{ form.vars.value.color }}">
       </div>
 
-      {# champs #}
       <div class="space-y-4">
-        {{ form_row(form.picture) }}
+        {{ form_row(form.avatarType) }}
+
+        <div id="default-avatar-section" class="avatar-section">
+          {{ form_row(form.defaultAvatar) }}
+        </div>
+
+        <div id="team-avatar-section" class="avatar-section" style="display:none;">
+          {{ form_row(form.teamAvatar) }}
+        </div>
+
+        <div id="custom-avatar-section" class="avatar-section" style="display:none;">
+          {{ form_row(form.customAvatar) }}
+        </div>
+
         {{ form_row(form.color) }}
 
         <div class="border-t pt-4">
@@ -35,9 +39,7 @@
           {{ form_row(form.speed) }}
         </div>
 
-        <button class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
-          Valider mon sbire
-        </button>
+        <button class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">Valider mon sbire</button>
       </div>
     </div>
 
@@ -46,14 +48,42 @@
 </div>
 
 <script>
-/* aperçu live */
-document.querySelectorAll('input[name="sbire[picture]"]').forEach(radio => {
-  radio.addEventListener('change', e => {
-    document.getElementById('sbire-preview').src = "{{ asset('images/avatars/') }}" + e.target.value;
-  });
-});
-document.getElementById('sbire_color').addEventListener('input', e => {
-  document.getElementById('sbire-preview').style.borderColor = e.target.value;
+document.addEventListener('DOMContentLoaded', () => {
+    const typeRadios = document.querySelectorAll('input[name="sbire[avatarType]"]');
+    const preview = document.getElementById('sbire-preview');
+
+    function toggleSections() {
+        const type = document.querySelector('input[name="sbire[avatarType]"]:checked').value;
+        document.querySelectorAll('.avatar-section').forEach(s => s.style.display = 'none');
+        if (type === 'default') document.getElementById('default-avatar-section').style.display = 'block';
+        if (type === 'team') document.getElementById('team-avatar-section').style.display = 'block';
+        if (type === 'custom') document.getElementById('custom-avatar-section').style.display = 'block';
+    }
+
+    function updatePreview(radio) {
+        if (radio) preview.src = "{{ asset('') }}" + radio.value;
+    }
+
+    typeRadios.forEach(r => r.addEventListener('change', toggleSections));
+
+    document.querySelectorAll('input[name="sbire[defaultAvatar]"], input[name="sbire[teamAvatar]"]').forEach(radio => {
+        radio.addEventListener('change', () => updatePreview(radio));
+    });
+
+    document.getElementById('sbire_customAvatar').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => preview.src = e.target.result;
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('sbire_color').addEventListener('input', e => {
+        preview.style.borderColor = e.target.value;
+    });
+
+    toggleSections();
 });
 </script>
 {% endblock %}
