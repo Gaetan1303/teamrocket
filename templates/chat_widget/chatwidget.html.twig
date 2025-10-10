@@ -1,0 +1,70 @@
+{% set chat_id = chat_id|default('chat-'~random()) %}
+<div class="chat-widget" id="{{ chat_id }}">
+    <select class="channel-switch">
+        {% for ch in channels %}
+            <option value="{{ ch.slug }}">{{ ch.name }}</option>
+        {% endfor %}
+    </select>
+
+    <div class="chat-messages"></div>
+
+    <form class="chat-form">
+        <input class="chat-input" type="text" placeholder="Votre message…" required>
+        <button>➤</button>
+    </form>
+</div>
+
+<script>
+(function (container) {
+    const mercureUrl = '{{ mercure_url|e('js') }}';
+    const token      = '{{ mercure_jwt|e('js') }}';
+    document.cookie  = 'mercureAuthorization='+token+'; path=/.well-known/mercure; secure; samesite=strict';
+
+    const channelSelect = container.querySelector('.channel-switch');
+    let current = channelSelect.value;
+    let es      = null;
+
+    const box   = container.querySelector('.chat-messages');
+    const input = container.querySelector('.chat-input');
+
+    function addLine(msg){
+        const d = document.createElement('div');
+        d.innerHTML = `<strong>${msg.user}</strong> <em>${msg.createdAt}</em><br>${msg.message}`;
+        box.appendChild(d);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function loadHistory(ch){
+        box.innerHTML = '';
+        const res = await fetch(`/chat/history/${ch}`);
+        (await res.json()).forEach(addLine);
+    }
+
+    function subscribe(ch){
+        if(es) es.close();
+        const u = new URL(mercureUrl);
+        u.searchParams.append('topic', `urn:teamrocket:chat:${ch}`);
+        es = new EventSource(u, {withCredentials:true});
+        es.onmessage = e => addLine(JSON.parse(e.data));
+    }
+
+    container.querySelector('.chat-form').addEventListener('submit', async e=>{
+        e.preventDefault();
+        const msg = input.value.trim();
+        if(!msg) return;
+        await fetch(`/chat/send/${current}`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({message:msg})
+        });
+        input.value='';
+    });
+
+    channelSelect.addEventListener('change', e=>{
+        current = e.target.value;
+        loadHistory(current); subscribe(current);
+    });
+
+    loadHistory(current); subscribe(current);
+})(document.currentScript.parentElement);
+</script>

@@ -1,80 +1,94 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Team Rocket & Co – Recrutement Ultime{% endblock %}
+{% block title %}Team Rocket & Co – Recrutement Ultime
+{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('/css/index.css') }}">
+	{{ parent() }}
+	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{{ asset('/css/index.css') }}">
 {% endblock %}
 
 {% block body %}
-<body class="dark-universe">
+	<body class="dark-universe">
 
-    <nav class="poke-nav">
-        {% if app.user %}
-            <span class="nav-welcome">
-                <strong>{{ app.user.teamVilain.name }}</strong>
-            </span>
-            <a href="{{ path('app_sbire_create') }}" class="btn-nav">Avatar</a>
-        {% endif %}
-    </nav>
+		<nav class="poke-nav">
+			{% if app.user %}
+				<span class="nav-welcome">
+					<strong>{{ app.user.teamVilain.name }}</strong>
+				</span>
+				<a href="{{ path('app_sbire_create') }}" class="btn-nav">Avatar</a>
+			{% endif %}
+		</nav>
 
-    <div class="scrolling-credo">
-        <div>
-            {% for team in teams %}
-                <span>« {{ team.credo }} »</span>
-            {% endfor %}
-        </div>
-    </div>
+		<div class="scrolling-credo">
+			<div>
+				{% for team in teams %}
+					<span>«
+						{{ team.credo }}
+						»</span>
+				{% endfor %}
+			</div>
+		</div>
 
-    {% if not app.user %}
-        <section class="cta-cell">
-            <div class="dialog-box">
-                <p class="typewriter" 
-                   data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp.">
-                </p>
-                <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
-            </div>
-        </section>
-    {% endif %}
+		{% if not app.user %}
+			<section class="cta-cell">
+				<div class="dialog-box">
+					<p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
+					<a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
+				</div>
+			</section>
+		{% endif %}
 
-    <section class="teams-detail container">
-        <h3 class="text-center mb-5" style="font-family:'Orbitron',sans-serif;">Index des organisations criminelles</h3>
-        {% for team in teams %}
-            {% set filename = team.name|lower|replace({' ':'-', 'é':'e', 'è':'e', 'æ':'ae'}) ~ '.png' %}
-            <div class="team-card" style="--c:{{ team.colorCode }};">
-                <img src="{{ asset('/images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
-                <div class="team-info">
-                    <div class="team-name" style="color:{{ team.colorCode }};">{{ team.name }}</div>
-                    <div class="team-region">Région : {{ team.region }}</div>
-                    <div class="team-credo">« {{ team.credo }} »</div>
-                </div>
-            </div>
-        {% endfor %}
-    </section>
+		<section class="teams-detail container">
+			<h3 class="text-center mb-5" style="font-family:'Orbitron',sans-serif;">Index des organisations criminelles</h3>
+			{% for team in teams %}
+				{% set filename = team.name|lower|replace({' ':'-', 'é':'e', 'è':'e', 'æ':'ae'}) ~ '.png' %}
+				<div class="team-card" style="--c:{{ team.colorCode }};">
+					<img src="{{ asset('/images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
+					<div class="team-info">
+						<div class="team-name" style="color:{{ team.colorCode }};">{{ team.name }}</div>
+						<div class="team-region">Région :
+							{{ team.region }}</div>
+						<div class="team-credo">«
+							{{ team.credo }}
+							»</div>
+					</div>
+				</div>
+			{% endfor %}
+		</section>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const p = document.querySelector('.typewriter');
-        if (!p) return;
+		{# ---  CHAT WIDGET (connectés uniquement)  --- #}
+		{% if app.user %}
+			<section class="global-chat mt-5">
+				<h3 class="text-center" style="font-family:'Orbitron',sans-serif;">Communications inter-vilains</h3>
+				{{ include('chat_widget/chatwidget.html.twig', {
+            channels:    channels,
+            mercure_url: mercure_url,
+            mercure_jwt: mercure_jwt
+        }) }}
+			</section>
+		{% endif %}
 
-        const text = p.dataset.text;
-        p.classList.add('typing');
-        let i = 0;
-        const interval = setInterval(() => {
-            p.textContent += text[i++];
-            if (i === text.length) clearInterval(interval);
-        }, 40);
-    });
-    </script>
-</body>
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+const p = document.querySelector('.typewriter');
+if (! p) 
+return;
+
+const text = p.dataset.text;
+p.classList.add('typing');
+let i = 0;
+const interval = setInterval(() => {
+p.textContent += text[i++];
+if (i === text.length) 
+clearInterval(interval);
+
+}, 40);
+});
+		</script>
+	</body>
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-{% endblock %}
-
-{% block footer %}
-    {{ parent() }}
-{% endblock %}
+{% block javascripts %}{% endblock %}
+{% block footer %}{% endblock %}
