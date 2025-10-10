@@ -2,6 +2,7 @@
 // src/Entity/Sbire.php
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -18,7 +19,7 @@ class Sbire
     private User $user;
 
     #[ORM\Column(length: 100)]
-    private string $picture = 'assets/images/characters/default-homme.png';
+    private string $picture = '/images/characters/default-homme.png';
 
     #[ORM\Column(length: 7)]
     private string $color = '#000000';

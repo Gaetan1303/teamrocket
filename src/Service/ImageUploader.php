@@ -22,7 +22,7 @@ class ImageUploader
         $safe = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $file->getClientOriginalName());
         $filename = $safe . '-' . uniqid() . '.' . $file->guessExtension();
 
-        $dir = $this->targetDirectory . '/assets/images/' . $subdir;
+        $dir = $this->targetDirectory . '/images/' . $subdir;
         $file->move($dir, $filename);
 
         $this->imagine->open($dir . '/' . $filename)

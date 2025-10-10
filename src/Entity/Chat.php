@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\ChatRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User;
+use App\Entity\Channel;
 
 #[ORM\Entity(repositoryClass: ChatRepository::class)]
 #[ORM\Table(name: 'chat')]
@@ -17,6 +20,10 @@ class Chat
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Channel::class, inversedBy: 'chats')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Channel $channel;
 
     #[ORM\Column(type: 'text')]
     private string $message;
@@ -42,6 +49,17 @@ class Chat
     public function setUser(User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getChannel(): Channel
+    {
+        return $this->channel;
+    }
+
+    public function setChannel(Channel $channel): self
+    {
+        $this->channel = $channel;
         return $this;
     }
 

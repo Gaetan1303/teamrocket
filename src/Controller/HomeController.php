@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\ChannelRepository;
 use App\Repository\TeamVilainRepository;
+use App\Service\MercureJwtFactory;
 use App\Service\PokemonApiService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,12 +17,14 @@ final class HomeController extends AbstractController
     public function index(
         PokemonApiService $pokemonApiService,
         TeamVilainRepository $teamRepo,
+        ChannelRepository $channelRepo,
+        MercureJwtFactory $jwtFactory,
         LoggerInterface $logger
     ): Response {
-        /* ---------- 1.  Teams ---------- */
+        /* ----------  Teams ---------- */
         $teams = $teamRepo->findAll();
 
-        /* ---------- 2.  Pokémon cible ALÉATOIRE ---------- */
+        /* ----------  Pokémon cible ALÉATOIRE ---------- */
         $targetPokemon = null;
         try {
             // ID aléatoire entre 1 et 898
@@ -38,10 +42,13 @@ final class HomeController extends AbstractController
             $logger->warning('Impossible de récupérer le Pokémon cible : '.$e->getMessage());
         }
 
-        /* ---------- 3.  Rendu ---------- */
+        /* ----------  Rendu ---------- */
         return $this->render('home/index.html.twig', [
             'teams'         => $teams,
             'targetPokemon' => $targetPokemon,
+            'channels'      => $channelRepo->findAll(),
+            'mercure_url'   => $_ENV['MERCURE_PUBLIC_URL'] ?? 'https://localhost/.well-known/mercure',
+            'mercure_jwt'   => $jwtFactory->createSubscriberJwt(),
         ]);
     }
 

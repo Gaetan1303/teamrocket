@@ -1,0 +1,23 @@
+{
+  "name": "teamrocket",
+  "version": "1.0.0",
+  "description": "Pokémon Fan-Made - Cahier des Charges Introduction",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gaetan1303/teamrocket.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gaetan1303/teamrocket/issues"
+  },
+  "homepage": "https://github.com/Gaetan1303/teamrocket#readme"
+}

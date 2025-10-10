@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Pokemon
 {
     /* ---------- Constantes pour le statut ---------- */
-    public const STATUS_WILD = 'Sauvage';
+    public const STATUS_WILD   = 'Sauvage';
     public const STATUS_CAUGHT = 'Capturé';
     public const STATUS_STOLEN = 'Volé';
 
@@ -29,6 +29,18 @@ class Pokemon
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $spriteFront = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $spriteBack = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $spriteFrontShiny = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $spriteBackShiny = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $officialArtwork = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
     private array $types = [];
@@ -80,7 +92,6 @@ class Pokemon
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -92,7 +103,6 @@ class Pokemon
     public function setApiId(string $apiId): self
     {
         $this->apiId = $apiId;
-
         return $this;
     }
 
@@ -104,7 +114,50 @@ class Pokemon
     public function setSpriteFront(?string $spriteFront): self
     {
         $this->spriteFront = $spriteFront;
+        return $this;
+    }
 
+    public function getSpriteBack(): ?string
+    {
+        return $this->spriteBack;
+    }
+
+    public function setSpriteBack(?string $spriteBack): self
+    {
+        $this->spriteBack = $spriteBack;
+        return $this;
+    }
+
+    public function getSpriteFrontShiny(): ?string
+    {
+        return $this->spriteFrontShiny;
+    }
+
+    public function setSpriteFrontShiny(?string $spriteFrontShiny): self
+    {
+        $this->spriteFrontShiny = $spriteFrontShiny;
+        return $this;
+    }
+
+    public function getSpriteBackShiny(): ?string
+    {
+        return $this->spriteBackShiny;
+    }
+
+    public function setSpriteBackShiny(?string $spriteBackShiny): self
+    {
+        $this->spriteBackShiny = $spriteBackShiny;
+        return $this;
+    }
+
+    public function getOfficialArtwork(): ?string
+    {
+        return $this->officialArtwork;
+    }
+
+    public function setOfficialArtwork(?string $officialArtwork): self
+    {
+        $this->officialArtwork = $officialArtwork;
         return $this;
     }
 
@@ -116,7 +169,6 @@ class Pokemon
     public function setTypes(?array $types): self
     {
         $this->types = $types ?? [];
-
         return $this;
     }
 
@@ -128,7 +180,6 @@ class Pokemon
     public function setBaseExperience(?int $baseExperience): self
     {
         $this->baseExperience = $baseExperience;
-
         return $this;
     }
 
@@ -140,7 +191,6 @@ class Pokemon
     public function setHeight(?int $height): self
     {
         $this->height = $height;
-
         return $this;
     }
 
@@ -152,7 +202,6 @@ class Pokemon
     public function setWeight(?int $weight): self
     {
         $this->weight = $weight;
-
         return $this;
     }
 
@@ -164,7 +213,6 @@ class Pokemon
     public function setHp(?int $hp): self
     {
         $this->hp = $hp;
-
         return $this;
     }
 
@@ -176,7 +224,6 @@ class Pokemon
     public function setAttack(?int $attack): self
     {
         $this->attack = $attack;
-
         return $this;
     }
 
@@ -188,7 +235,6 @@ class Pokemon
     public function setDefense(?int $defense): self
     {
         $this->defense = $defense;
-
         return $this;
     }
 
@@ -200,7 +246,6 @@ class Pokemon
     public function setSpecialAttack(?int $specialAttack): self
     {
         $this->specialAttack = $specialAttack;
-
         return $this;
     }
 
@@ -212,7 +257,6 @@ class Pokemon
     public function setSpecialDefense(?int $specialDefense): self
     {
         $this->specialDefense = $specialDefense;
-
         return $this;
     }
 
@@ -224,7 +268,6 @@ class Pokemon
     public function setSpeed(?int $speed): self
     {
         $this->speed = $speed;
-
         return $this;
     }
 
@@ -239,7 +282,6 @@ class Pokemon
             throw new \InvalidArgumentException("Statut invalide : $status");
         }
         $this->status = $status;
-
         return $this;
     }
 }

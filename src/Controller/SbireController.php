@@ -41,7 +41,7 @@ class SbireController extends AbstractController
                     $file = $form->get('customAvatar')->getData();
                     if ($file) {
                         $filename = $uploader->uploadAndResize($file, 'characters', 200, 200);
-                        $sbire->setPicture('assets/images/characters/' . $filename);
+                        $sbire->setPicture('/images/characters/' . $filename);
                     }
                     break;
             }
