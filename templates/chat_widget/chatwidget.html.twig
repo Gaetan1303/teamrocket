@@ -1,70 +1,249 @@
+{# templates/chat_widget/index.html.twig #}
 {% set chat_id = chat_id|default('chat-'~random()) %}
-<div class="chat-widget" id="{{ chat_id }}">
-    <select class="channel-switch">
-        {% for ch in channels %}
-            <option value="{{ ch.slug }}">{{ ch.name }}</option>
-        {% endfor %}
-    </select>
 
-    <div class="chat-messages"></div>
+<style>
+/* ===== MMO CHAT UNIQUE (sans couleur) ===== */
+#{{ chat_id }} {
+    --chat-width: 350px;
+    --chat-bg: #111;
+    --chat-border: #ffcc00;
+}
+#{{ chat_id }} #chat-toggle-{{ chat_id }} {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--chat-border);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--chat-border);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+#{{ chat_id }} #chat-badge-{{ chat_id }} {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: crimson;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+#{{ chat_id }} #chat-badge-{{ chat_id }}.hidden {
+    display: none;
+}
+#{{ chat_id }} #chat-panel-{{ chat_id }} {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: var(--chat-width);
+    background: var(--chat-bg);
+    border-left: 3px solid var(--chat-border);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 998;
+}
+#{{ chat_id }} #chat-panel-{{ chat_id }}.closed {
+    transform: translateX(100%);
+}
+#{{ chat_id }} header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--chat-border);
+    font-family: 'Orbitron', sans-serif;
+    color: var(--chat-border);
+}
+#{{ chat_id }} #chat-close-{{ chat_id }} {
+    background: none;
+    border: none;
+    color: var(--chat-border);
+    font-size: 20px;
+    cursor: pointer;
+}
+#{{ chat_id }} .chat-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    border-bottom: 1px solid #333;
+}
+#{{ chat_id }} .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: 2px solid var(--chat-border);
+    color: #fff;
+    padding: 6px 0;
+    cursor: pointer;
+    transition: 0.2s;
+}
+#{{ chat_id }} .tab-btn.active,
+#{{ chat_id }} .tab-btn:hover {
+    background: var(--chat-border);
+    color: #000;
+}
+#{{ chat_id }} .chat-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+#{{ chat_id }} .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background: #000;
+    color: #eee;
+    font-size: 14px;
+}
+#{{ chat_id }} .chat-messages div {
+    margin-bottom: 8px;
+}
+#{{ chat_id }} .chat-form {
+    display: flex;
+    padding: 8px;
+    gap: 6px;
+}
+#{{ chat_id }} .chat-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #222;
+    color: #fff;
+}
+#{{ chat_id }} .chat-form button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background: var(--chat-border);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+}
+</style>
 
-    <form class="chat-form">
-        <input class="chat-input" type="text" placeholder="Votre message…" required>
-        <button>➤</button>
-    </form>
+<div id="{{ chat_id }}">
+    <button id="chat-toggle-{{ chat_id }}" aria-label="Ouvrir le chat">
+        <span id="chat-icon-{{ chat_id }}">💬</span>
+        <span id="chat-badge-{{ chat_id }}" class="hidden">0</span>
+    </button>
+
+    <aside id="chat-panel-{{ chat_id }}" class="closed">
+        <header>
+            <h3>Communications</h3>
+            <button id="chat-close-{{ chat_id }}" aria-label="Fermer">✖</button>
+        </header>
+
+        <nav class="chat-tabs">
+            {% for ch in channels %}
+                <button class="tab-btn" data-channel="{{ ch.slug }}">
+                    {{ ch.name }}
+                </button>
+            {% endfor %}
+        </nav>
+
+        <div class="chat-content">
+            <div class="chat-messages"></div>
+            <form class="chat-form">
+                <input class="chat-input" type="text" placeholder="Écrire…" required>
+                <button>➤</button>
+            </form>
+        </div>
+    </aside>
 </div>
 
 <script>
-(function (container) {
+(() => {
+    const root       = document.getElementById('{{ chat_id }}');
+    const toggleBtn  = document.getElementById('chat-toggle-{{ chat_id }}');
+    const closeBtn   = document.getElementById('chat-close-{{ chat_id }}');
+    const panel      = document.getElementById('chat-panel-{{ chat_id }}');
+    const badge      = document.getElementById('chat-badge-{{ chat_id }}');
+    const messagesEl = root.querySelector('.chat-messages');
+    const input      = root.querySelector('.chat-input');
+    const form       = root.querySelector('.chat-form');
+
     const mercureUrl = '{{ mercure_url|e('js') }}';
-    const token      = '{{ mercure_jwt|e('js') }}';
-    document.cookie  = 'mercureAuthorization='+token+'; path=/.well-known/mercure; secure; samesite=strict';
+    const jwt        = '{{ mercure_jwt|e('js') }}';
+    document.cookie  = `mercureAuthorization=${jwt}; path=/.well-known/mercure; secure; samesite=strict`;
 
-    const channelSelect = container.querySelector('.channel-switch');
-    let current = channelSelect.value;
-    let es      = null;
+    const channels   = {{ channels|json_encode|raw }};
+    let currentSlug  = channels[0].slug;
+    let es           = null;
+    let unread       = {};
 
-    const box   = container.querySelector('.chat-messages');
-    const input = container.querySelector('.chat-input');
+    toggleBtn.addEventListener('click', () => panel.classList.remove('closed'));
+    closeBtn.addEventListener('click',  () => panel.classList.add('closed'));
 
-    function addLine(msg){
-        const d = document.createElement('div');
-        d.innerHTML = `<strong>${msg.user}</strong> <em>${msg.createdAt}</em><br>${msg.message}`;
-        box.appendChild(d);
-        box.scrollTop = box.scrollHeight;
+    root.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchChannel(btn.dataset.channel, btn));
+    });
+
+    function switchChannel(slug, btn) {
+        root.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSlug = slug;
+        messagesEl.innerHTML = '';
+        loadHistory(slug);
+        subscribe(slug);
+        unread[slug] = 0;
+        updateBadge();
     }
 
-    async function loadHistory(ch){
-        box.innerHTML = '';
-        const res = await fetch(`/chat/history/${ch}`);
-        (await res.json()).forEach(addLine);
+    async function loadHistory(slug) {
+        const res = await fetch(`/chat/history/${slug}`);
+        const msgs = await res.json();
+        msgs.forEach(addLine);
     }
 
-    function subscribe(ch){
-        if(es) es.close();
+    function subscribe(slug) {
+        if (es) es.close();
         const u = new URL(mercureUrl);
-        u.searchParams.append('topic', `urn:teamrocket:chat:${ch}`);
-        es = new EventSource(u, {withCredentials:true});
-        es.onmessage = e => addLine(JSON.parse(e.data));
+        u.searchParams.append('topic', `urn:teamrocket:chat:${slug}`);
+        es = new EventSource(u, { withCredentials: true });
+        es.onmessage = e => {
+            addLine(JSON.parse(e.data));
+            if (slug !== currentSlug || panel.classList.contains('closed')) {
+                unread[slug] = (unread[slug] || 0) + 1;
+                updateBadge();
+            }
+        };
     }
 
-    container.querySelector('.chat-form').addEventListener('submit', async e=>{
+    function addLine(msg) {
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${msg.user}</strong> <em>${msg.createdAt}</em><br>${msg.message}`;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    form.addEventListener('submit', async e => {
         e.preventDefault();
         const msg = input.value.trim();
-        if(!msg) return;
-        await fetch(`/chat/send/${current}`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({message:msg})
+        if (!msg) return;
+        await fetch(`/chat/send/${currentSlug}`, {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body   : JSON.stringify({ message: msg })
         });
-        input.value='';
+        input.value = '';
     });
 
-    channelSelect.addEventListener('change', e=>{
-        current = e.target.value;
-        loadHistory(current); subscribe(current);
-    });
+    function updateBadge() {
+        const total = Object.values(unread).reduce((a, b) => a + b, 0);
+        badge.textContent = total;
+        badge.classList.toggle('hidden', total === 0);
+    }
 
-    loadHistory(current); subscribe(current);
-})(document.currentScript.parentElement);
+    root.querySelector('.tab-btn').click(); // active 1er onglet
+})();
 </script>
