@@ -1,12 +1,14 @@
 {# templates/base.html.twig #}
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Team des Sbires{% endblock %}</title>
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
     <style>
         :root{
             --clr-bg:#4F0606;
@@ -17,10 +19,6 @@
             --ff-body:'Press Start 2P',cursive;
             --fw-body:400;
             --lh-body:1.6;
-
-            /* Grille rétro
-            --clr-grid:#1c1c1c; 
-            --grid-size: 25px; */
         }
         
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -34,17 +32,12 @@
             min-height:100vh;
             display:flex;
             flex-direction:column;
-
-            background-image:
-                linear-gradient(to right, var(--clr-grid) 1px, transparent 1px),
-                linear-gradient(to bottom, var(--clr-grid) 1px, transparent 1px);
-            background-size: var(--grid-size) var(--grid-size);
             background-color: var(--clr-bg); 
             position: relative;
             z-index: 1;
         }
-        
-        /* Scanlines */
+
+        /* Scanlines effet rétro */
         body::before {
             content: "";
             position: fixed; 
@@ -70,7 +63,7 @@
         a:hover{color:#fff}
         img{max-width:100%;display:block}
 
-        /* ---------- navbar visuelle (même style que index) ---------- */
+        /* ---------- Navbar Team Rocket ---------- */
         .poke-banner{
             display:flex; align-items:center; justify-content:space-between;
             padding:2rem 3rem; background:#111; border-bottom:3px solid var(--clr-accent);
@@ -89,7 +82,7 @@
         .btn-nav:hover{background:var(--clr-accent); color:#000;}
         .nav-welcome{color:#fff; margin-right:.5rem;}
 
-        /* Footer */
+        /* ---------- Footer ---------- */
         footer{
             background:#000;
             padding:2rem 0;
@@ -100,51 +93,52 @@
         .target-pkm{width:100px;image-rendering:pixelated}
     </style>
 
-    {% block stylesheets %}{% endblock %}
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
 </head>
 
 <body>
-{# ----------------  NAVBAR CENTRALISÉE  ---------------- #}
-{% block navigation %}
-<nav class="poke-banner">
-    <h1>Rejoignez les Teams de Vilains</h1>
+    {# ---------- NAVBAR ---------- #}
+    {% block navigation %}
+    <nav class="poke-banner">
+        <h1>Rejoignez les Teams de Vilains</h1>
 
-    <div class="poke-nav">
-        {% if app.user %}
-            {# --- CONNECTÉ --- #}
-            <span class="nav-welcome">Salut, <strong>{{ app.user.codename }}</strong></span>
+        <div class="poke-nav">
+            {% if app.user %}
+                <span class="nav-welcome">Salut, <strong>{{ app.user.codename }}</strong></span>
+                <a href="{{ path('app_logout') }}" class="btn-nav">Déconnexion</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn-nav">Connexion</a>
+                <a href="{{ path('app_register') }}" class="btn-nav">S’inscrire</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
 
-            <a href="{{ path('app_logout') }}" class="btn-nav">Déconnexion</a>
+    {# ---------- CONTENU PRINCIPAL ---------- #}
+    <main id="root">
+        {% block body %}{% endblock %}
+    </main>
 
-            {# Bouton vers le futur controller Mission
-            <a href="{{ path('app_mission_start') }}" class="btn-nav">Lancer une mission !</a> #}
+    {# ---------- FOOTER ---------- #}
+    {% block footer %}
+    <footer>
+        <div class="container text-center">
+            <h5 class="mb-2">Pokémon recherché actuellement par toutes les Teams</h5>
+            {% if targetPokemon %}
+                <p class="mb-1"><strong>{{ targetPokemon.name|capitalize }}</strong></p>
+                <img class="target-pkm" src="{{ targetPokemon.sprite }}" alt="{{ targetPokemon.name }}">
+                <p class="text-muted small mb-0">Types : {{ targetPokemon.types|join(', ') }}</p>
+            {% else %}
+                <p class="text-warning">Aucune cible n'est actuellement définie.</p>
+            {% endif %}
+        </div>
+    </footer>
+    {% endblock %}
 
-        {% else %}
-            {# --- NON CONNECTÉ --- #}
-            <a href="{{ path('app_login') }}"  class="btn-nav">Connexion</a>
-            <a href="{{ path('app_register') }}" class="btn-nav">S’inscrire</a>
-        {% endif %}
-    </div>
-</nav>
-{% endblock %}
-{# -------------------------------------------------------- #}
-
-{% block body %}{% endblock %}
-
-{% block footer %}
-<footer>
-    <div class="container text-center">
-        <h5 class="mb-2">Pokémon recherché actuellement par toutes les Teams</h5>
-        {% if targetPokemon %}
-            <p class="mb-1"><strong>{{ targetPokemon.name|capitalize }}</strong></p>
-            <img class="target-pkm" src="{{ targetPokemon.sprite }}" alt="{{ targetPokemon.name }}">
-            <p class="text-muted small mb-0">Types : {{ targetPokemon.types|join(', ') }}</p>
-        {% else %}
-            <p class="text-warning">Aucune cible n'est actuellement définie.</p>
-        {% endif %}
-    </div>
-</footer>
-{% endblock %}
-
-{% block javascripts %}{% endblock %}
+    {# {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %} #}
+</body>
 </html>

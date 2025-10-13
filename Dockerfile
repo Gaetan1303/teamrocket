@@ -3,23 +3,17 @@
 # Versions
 FROM dunglas/frankenphp:1-php8.4 AS frankenphp_upstream
 
-# The different stages of this Dockerfile are meant to be built into separate images
-# https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
-# https://docs.docker.com/compose/compose-file/#target
-
-
 # Base FrankenPHP image
 FROM frankenphp_upstream AS frankenphp_base
 
 WORKDIR /app
-
 VOLUME /app/var/
 
 # persistent / runtime deps
-# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	file \
 	git \
+	curl \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
@@ -54,7 +48,9 @@ ENTRYPOINT ["docker-entrypoint"]
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
 
-# Dev FrankenPHP image
+# ------------------------------------------------------------------
+# 🧩 DEV IMAGE — avec Node.js, npm, React & Webpack Encore support
+# ------------------------------------------------------------------
 FROM frankenphp_base AS frankenphp_dev
 
 ENV APP_ENV=dev
@@ -64,15 +60,21 @@ ENV FRANKENPHP_WORKER_CONFIG=watch
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
-	install-php-extensions \
-		xdebug \
-	;
+	install-php-extensions xdebug ;
+
+# ✅ Ajout de Node.js + npm pour React
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+	&& apt-get install -y nodejs \
+	&& npm install -g npm \
+	&& npm install -g yarn
 
 COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 
-# Prod FrankenPHP image
+# ------------------------------------------------------------------
+# 🧱 PROD IMAGE — pas de Node.js ici (build déjà fait)
+# ------------------------------------------------------------------
 FROM frankenphp_base AS frankenphp_prod
 
 ENV APP_ENV=prod

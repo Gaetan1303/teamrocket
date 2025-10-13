@@ -3,21 +3,37 @@
   "version": "1.0.0",
   "description": "Pokémon Fan-Made - Cahier des Charges Introduction",
   "main": "index.js",
-  "directories": {
-    "doc": "docs",
-    "test": "tests"
-  },
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "encore dev --progress --color",
+    "build": "encore production --progress --color",
+    "watch": "encore dev --watch"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gaetan1303/teamrocket.git"
+    "url": "https://github.com/Gaetan1303/teamrocket.git"
   },
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Gaetan1303/teamrocket/issues"
   },
-  "homepage": "https://github.com/Gaetan1303/teamrocket#readme"
+  "homepage": "https://github.com/Gaetan1303/teamrocket#readme",
+  "dependencies": {
+    "@symfony/stimulus-bridge": "^4.0.1",
+    "@symfony/webpack-encore": "^5.2.0",
+    "core-js": "^3.46.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "regenerator-runtime": "^0.14.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "autoprefixer": "^10.4.14",
+    "babel-loader": "^9.2.1",
+    "postcss": "^8.5.6",
+    "postcss-loader": "^8.2.0",
+    "webpack-notifier": "^1.15.0"
+  }
 }
