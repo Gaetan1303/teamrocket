@@ -1,4 +1,4 @@
-{# templates/chat_widget/index.html.twig #}
+{# templates/chat_widget/chatwidget.html.twig #}
 {% set chat_id = chat_id|default('chat-'~random()) %}
 
 <style>
@@ -188,19 +188,12 @@
         btn.addEventListener('click', () => switchChannel(btn.dataset.channel, btn));
     });
 
-    function switchChannel(slug, btn) {
-        root.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentSlug = slug;
-        messagesEl.innerHTML = '';
-        loadHistory(slug);
-        subscribe(slug);
-        unread[slug] = 0;
-        updateBadge();
-    }
-
     async function loadHistory(slug) {
         const res = await fetch(`/chat/history/${slug}`);
+        if (!res.ok) {                       // ✨ évite JSON.parse sur 404/500
+            messagesEl.innerHTML = '<li class="text-warning">Impossible de charger l’historique.</li>';
+            return;
+        }
         const msgs = await res.json();
         msgs.forEach(addLine);
     }
@@ -219,6 +212,17 @@
         };
     }
 
+    function switchChannel(slug, btn) {
+        root.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSlug = slug;
+        messagesEl.innerHTML = '';
+        loadHistory(slug);
+        subscribe(slug);
+        unread[slug] = 0;
+        updateBadge();
+    }
+
     function addLine(msg) {
         const div = document.createElement('div');
         div.innerHTML = `<strong>${msg.user}</strong> <em>${msg.createdAt}</em><br>${msg.message}`;
@@ -230,12 +234,13 @@
         e.preventDefault();
         const msg = input.value.trim();
         if (!msg) return;
-        await fetch(`/chat/send/${currentSlug}`, {
+        const res = await fetch(`/chat/send/${currentSlug}`, {
             method : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body   : JSON.stringify({ message: msg })
         });
-        input.value = '';
+        if (res.ok) input.value = '';
+        else console.error('send error', res.status);
     });
 
     function updateBadge() {

@@ -1,7 +1,6 @@
 <?php
 namespace App\Controller;
 
-use App\Entity\Chat;
 use App\Repository\ChannelRepository;
 use App\Service\MercureJwtFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ChatController extends AbstractController
 {
-    #[Route('/chat', name: 'chat_index', methods: ['GET'])]
+    #[Route('/chat', name: 'chat_index')]
     public function index(MercureJwtFactory $jwtFactory): Response
     {
         return $this->render('chat/index.html.twig', [
@@ -27,15 +26,22 @@ class ChatController extends AbstractController
     }
 
     #[Route('/chat/history/{channel}', name: 'chat_history', methods: ['GET'])]
-    public function history(string $channel, EntityManagerInterface $em): JsonResponse
-    {
+    public function history(
+        string $channel,
+        ChannelRepository $channelRepo,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $ch = $channelRepo->findOneBy(['slug' => $channel]);
+        if (!$ch) {
+            return new JsonResponse(['error' => 'Canal inconnu'], 404);
+        }
+
         $messages = $em->createQueryBuilder()
-            ->select('c.id, c.message, c.createdAt, u.username as user')
-            ->from(Chat::class, 'c')
+            ->select('c.id, c.message, c.createdAt, u.codename as user')
+            ->from(\App\Entity\Chat::class, 'c')
             ->join('c.user', 'u')
-            ->join('c.channel', 'ch')
-            ->where('ch.slug = :slug')
-            ->setParameter('slug', $channel)
+            ->where('c.channel = :ch')
+            ->setParameter('ch', $ch)
             ->orderBy('c.createdAt', 'ASC')
             ->setMaxResults(50)
             ->getQuery()
@@ -49,8 +55,8 @@ class ChatController extends AbstractController
         string $channel,
         Request $request,
         HubInterface $hub,
-        EntityManagerInterface $em,
-        ChannelRepository $channelRepo
+        ChannelRepository $channelRepo,
+        EntityManagerInterface $em
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $content = trim($data['message'] ?? '');
@@ -63,11 +69,11 @@ class ChatController extends AbstractController
             return new JsonResponse(['error' => 'Canal inconnu'], 404);
         }
 
-        $chat = new Chat();
-        $chat->setMessage($content);
-        $chat->setCreatedAt(new \DateTimeImmutable());
-        $chat->setUser($this->getUser());
-        $chat->setChannel($ch);
+        $chat = new \App\Entity\Chat();
+        $chat->setMessage($content)
+             ->setCreatedAt(new \DateTimeImmutable())
+             ->setUser($this->getUser())
+             ->setChannel($ch);
 
         $em->persist($chat);
         $em->flush();
@@ -76,19 +82,12 @@ class ChatController extends AbstractController
             "urn:teamrocket:chat:{$channel}",
             json_encode([
                 'id'        => $chat->getId(),
-                'user'      => $this->getUser()?->getUserIdentifier() ?? 'Anonyme',
+                'user'      => $this->getUser()->getUserIdentifier(),
                 'message'   => $chat->getMessage(),
                 'createdAt' => $chat->getCreatedAt()->format('Y-m-d H:i:s'),
             ])
         ));
 
         return new JsonResponse(['status' => 'published']);
-    }
-
-    #[Route('/chat/clear', name: 'chat_clear', methods: ['DELETE'])]
-    public function clear(EntityManagerInterface $em): JsonResponse
-    {
-        $em->createQuery('DELETE FROM App\Entity\Chat')->execute();
-        return new JsonResponse(['status' => 'cleared']);
     }
 }

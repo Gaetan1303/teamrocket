@@ -240,3 +240,49 @@
 .chat-form button:hover {
     background: #ffdd33;
 }
+/* Bouton animé « Commencez l'aventure ! » */
+/* ---------- Bouton animé INDEX « Commencez l'aventure ! » ---------- */
+.btn-adventure{
+    display:inline-block;
+    margin-top:1rem;               /* ← moins d’espace */
+    padding:.55rem 1.2rem;         /* ← un poil plus petit */
+    background:transparent;
+    color:#ffcc00;
+    font-family:'Orbitron',sans-serif;
+    font-size:1rem;                /* ← taille réduite */
+    font-weight:700;
+    border:2px solid #ffcc00;
+    border-radius:6px;
+    text-decoration:none;
+    position:relative;
+    overflow:hidden;
+    transition:.3s;
+    box-shadow:0 0 8px rgba(255,204,0,.6);
+}
+.btn-adventure:hover{
+    background:#ffcc00;
+    color:#000;
+    box-shadow:0 0 16px #ffcc00;
+}
+/* Le glitch n’est visible QUE quand on survole */
+.btn-adventure .btn-adventure__glitch{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    opacity:0;          /* ← caché par défaut */
+    pointer-events:none;
+}
+.btn-adventure:hover .btn-adventure__glitch{
+    opacity:.8;
+    animation:glitch .25s infinite;
+}
+@keyframes glitch{
+    0%{transform:translate(0)}
+    20%{transform:translate(-2px,2px)}
+    40%{transform:translate(-2px,-2px)}
+    60%{transform:translate(2px,2px)}
+    80%{transform:translate(2px,-2px)}
+    100%{transform:translate(0)}
+}
