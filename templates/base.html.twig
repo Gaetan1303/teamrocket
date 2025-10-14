@@ -121,21 +121,7 @@
         {% block body %}{% endblock %}
     </main>
 
-    {# ---------- FOOTER ---------- #}
-    {% block footer %}
-    <footer>
-        <div class="container text-center">
-            <h5 class="mb-2">Pokémon recherché actuellement par toutes les Teams</h5>
-            {% if targetPokemon %}
-                <p class="mb-1"><strong>{{ targetPokemon.name|capitalize }}</strong></p>
-                <img class="target-pkm" src="{{ targetPokemon.sprite }}" alt="{{ targetPokemon.name }}">
-                <p class="text-muted small mb-0">Types : {{ targetPokemon.types|join(', ') }}</p>
-            {% else %}
-                <p class="text-warning">Aucune cible n'est actuellement définie.</p>
-            {% endif %}
-        </div>
-    </footer>
-    {% endblock %}
+   
 
 
     {# Route pour le Webpack}

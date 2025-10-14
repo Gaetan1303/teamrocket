@@ -57,4 +57,10 @@ class Sbire
 
     public function getSpeed(): int { return $this->speed; }
     public function setSpeed(int $speed): self { $this->speed = $speed; return $this; }
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+private bool $hasDoneFirstTheft = false;
+
+#[ORM\Column(type: 'integer', nullable: true, unique: true)]
+private ?int $starterPokemonId = null;
 }

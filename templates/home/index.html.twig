@@ -17,7 +17,6 @@
     </div>
 </section>
 
-{# ---- CTA : same box for both states ---- #}
 <section class="cta-cell">
     <div class="dialog-box">
         {% if not app.user %}
@@ -25,7 +24,8 @@
             <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
         {% else %}
             <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
-            <a href="{{ path('game_first_theft') }}" class="btn-adventure">
+            {# Modification de la route Team pour faire correspondre la mission à la Team#}
+          <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
                 <span class="btn-adventure__text">Commencez l'aventure !</span>
                 <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
             </a>
@@ -48,7 +48,6 @@
     {% endfor %}
 </section>
 
-
 {% if app.user %}
     <section class="global-chat mt-5">
         <h3 class="text-center" style="font-family:'Orbitron',sans-serif;">Tu veux communiquer avec les autres sbires ? =></h3>
@@ -60,7 +59,6 @@
     </section>
 {% endif %}
 {% endblock %}
-
 
 {% block javascripts %}{% endblock %}
 {% block footer %}{% endblock %}

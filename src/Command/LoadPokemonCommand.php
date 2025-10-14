@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[AsCommand(
     name: 'app:pokemon:load',
@@ -19,7 +20,8 @@ class LoadPokemonCommand extends Command
 {
     public function __construct(
         private PokemonApiService $api,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
+        private ParameterBagInterface $params
     ) {
         parent::__construct();
     }
@@ -29,8 +31,8 @@ class LoadPokemonCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Chargement des Pokémon');
 
-        // 151 premiers (Kanto) – modifie si tu veux plus
-        for ($i = 1; $i <= 898; $i++) {
+        $max = $this->params->get('pokeapi_max_id'); // 1025 dans services.yaml
+        for ($i = 1; $i <= $max; $i++) {
             $dto = $this->api->getPokemon($i);
             if (!$dto) {
                 $io->warning("Pokemon $i absent de l’API");

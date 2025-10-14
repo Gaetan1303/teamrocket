@@ -2,106 +2,113 @@
 
 namespace App\Controller;
 
-use App\Entity\Sbire;
-use App\Service\PokemonApiService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\PokemonRepository;
+use App\Service\MissionGeneratorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class GameController extends AbstractController
 {
-    /* -----------------------------------------------------------------
-     * Page du mini-jeu
-     * ----------------------------------------------------------------- */
-    #[Route('/game/first-theft', name: 'game_first_theft')]
-    #[IsGranted('ROLE_USER')]
-    public function firstTheft(CsrfTokenManagerInterface $csrfTokenManager): \Symfony\Component\HttpFoundation\Response
+    // --- Route spécifique : récupérer un Pokémon par type ---
+    #[Route(
+        '/game/first-theft/mission-pokemon/{type}',
+        name: 'game_mission_pokemon',
+        priority: 30
+    )]
+    public function missionPokemon(string $type, PokemonRepository $repo): JsonResponse
     {
-        return $this->render('game/first_theft.html.twig', [
-            'csrf_token' => $csrfTokenManager->getToken('first_theft')->getValue(),
+        $normalizedType = ucfirst(strtolower($type));
+        $candidates = [];
+
+        foreach ($repo->findAll() as $p) {
+            $typesLower = array_map('strtolower', $p->getTypes());
+            if (in_array(strtolower($normalizedType), $typesLower, true)) {
+                $candidates[] = $p;
+            }
+        }
+
+        if (!$candidates) {
+            return new JsonResponse(['error' => "Aucun Pokémon trouvé pour le type $normalizedType"], 404);
+        }
+
+        $pokemon = $candidates[array_rand($candidates)];
+
+        $isShiny = method_exists($pokemon, 'isShiny') ? $pokemon->isShiny() : false;
+        $sprite  = null;
+
+        if ($isShiny && method_exists($pokemon, 'getSpriteFrontShiny')) {
+            $sprite = $pokemon->getSpriteFrontShiny();
+        } elseif (method_exists($pokemon, 'getSpriteFront')) {
+            $sprite = $pokemon->getSpriteFront();
+        }
+
+        if (!$sprite) {
+            $sprite = '/images/default_pokemon.png';
+        }
+
+        return new JsonResponse([
+            'id'     => $pokemon->getId(),
+            'name'   => $pokemon->getName(),
+            'types'  => $pokemon->getTypes(),
+            'sprite' => $sprite,
+            'shiny'  => $isShiny,
         ]);
     }
 
-    /* -----------------------------------------------------------------
-     * Réception du résultat (Ajax)
-     * ----------------------------------------------------------------- */
-    #[Route('/game/first-theft/result', name: 'game_first_theft_result', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function result(
-        Request $request,
-        EntityManagerInterface $em,
-        PokemonApiService $pokemonApi,
-        CsrfTokenManagerInterface $csrfTokenManager
-    ): JsonResponse {
-        $user = $this->getUser();
-
-        if (!$user instanceof Sbire) {
-            return new JsonResponse(['success' => false, 'message' => 'Utilisateur invalide'], 400);
+    // --- Route POST pour la capture ---
+    #[Route(
+        '/game/first-theft/result',
+        name: 'game_first_theft_result',
+        methods: ['POST'],
+        priority: 40
+    )]
+    public function firstTheftResult(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return new JsonResponse(['success' => false, 'message' => 'Données invalides'], 400);
         }
 
-        // Vérification CSRF
-        $token = $request->headers->get('X-CSRF-TOKEN');
-        if (!$csrfTokenManager->isTokenValid($csrfTokenManager->getToken('first_theft'), $token)) {
-            return new JsonResponse(['success' => false, 'message' => 'Token CSRF invalide'], 400);
-        }
-
-        $data      = json_decode($request->getContent(), true);
-        $success   = isset($data['success']) && $data['success'] === true;
-        $starter   = $data['starter'] ?? null;
-        $starterId = $data['starterId'] ?? null;
-
-        // Succès : on valide et on enregistre
-        if ($success && $starter && $starterId) {
-            if (!$pokemonApi->exists($starterId)) {
-                return new JsonResponse(['success' => false, 'message' => 'Pokémon invalide'], 400);
-            }
-
-            $user->setHasDoneFirstTheft(true);
-            $user->setStarterPokemon($starter);
-            $user->setStarterPokemonId($starterId);
-
-            $em->persist($user);
-            $em->flush();
-
-            return new JsonResponse([
-                'success' => true,
-                'message' => "Premier vol réussi : tu as attrapé $starter !",
-                'sprite'  => $pokemonApi->getSprite($starterId),
-                'types'   => $pokemonApi->getTypes($starterId),
-            ]);
-        }
-
-        return new JsonResponse(['success' => false, 'message' => 'Échec du vol ou données manquantes'], 200);
+        return new JsonResponse([
+            'success' => true,
+            'message' => sprintf('Tu as capturé %s avec succès !', $data['starter'] ?? 'un Pokémon mystérieux'),
+        ]);
     }
 
-    /* -----------------------------------------------------------------
-     * Profil du sbire
-     * ----------------------------------------------------------------- */
-    #[Route('/profile', name: 'sbire_profile')]
-    #[IsGranted('ROLE_USER')]
-    public function profile(PokemonApiService $pokemonApi): \Symfony\Component\HttpFoundation\Response
+    // --- Route générique : mission pour une team ---
+    #[Route(
+        '/game/first-theft/{team}',
+        name: 'game_first_theft',
+        defaults: ['team' => null],
+        priority: 10
+    )]
+    public function firstTheft(?string $team, MissionGeneratorService $missionGen): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof Sbire) {
-            throw $this->createAccessDeniedException();
+        if (!$team) {
+            return $this->redirectToRoute('app_register');
         }
 
-        $pokemonData = null;
-        if ($user->getStarterPokemonId()) {
-            $pokemonData = [
-                'name'   => $user->getStarterPokemon(),
-                'sprite' => $pokemonApi->getSprite($user->getStarterPokemonId()),
-                'types'  => $pokemonApi->getTypes($user->getStarterPokemonId()),
-            ];
+        try {
+            $mission = $missionGen->generateForTeam($team);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->createNotFoundException('Team inconnue');
         }
 
-        return $this->render('game/profile.html.twig', [
-            'sbire'   => $user,
-            'pokemon' => $pokemonData,
+        $csrf = $this->container->get('security.csrf.token_manager')->getToken('game_first_theft');
+
+        return $this->render('game/first_theft.html.twig', [
+            'mission' => (object)[
+                'titre'        => "Mission pour {$mission['team']}",
+                'description'  => $mission['goal'],
+                'action_verbe' => 'Capturer',
+                'cible_type'   => $mission['target_type'],
+                'team_color'   => $mission['color'],
+                'region'       => $mission['region'],
+            ],
+            'csrf_token' => $csrf,
         ]);
     }
 }
