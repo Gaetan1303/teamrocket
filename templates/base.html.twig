@@ -1,4 +1,3 @@
-{# templates/base.html.twig #}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,103 +6,102 @@
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        :root{
-            --clr-bg:#4F0606;
-            --clr-primary:#8b0000;
-            --clr-secondary:#111;
-            --clr-text:#f0f0f0;
-            --clr-accent:#ffcc00;
-            --ff-body:'Press Start 2P',cursive;
-            --fw-body:400;
-            --lh-body:1.6;
-        }
-        
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{scroll-behavior:smooth}
-        
-        body{
-            background:var(--clr-bg);
-            color:var(--clr-text);
-            font-family:var(--ff-body);
-            line-height:var(--lh-body);
-            min-height:100vh;
-            display:flex;
-            flex-direction:column;
-            background-color: var(--clr-bg); 
-            position: relative;
-            z-index: 1;
-        }
+    /* =====  VARIABLES UNIVERS VILAINS  ===== */
+    :root{
+        --clr-bg:#0d0d17;
+        --clr-primary:#00f0ff;
+        --clr-secondary:#ff00c1;
+        --clr-text:#e5e5e5;
+        --clr-accent:var(--clr-primary);
+        --ff-body:'Orbitron',monospace;
+        --fw-body:400;
+        --lh-body:1.5;
+    }
 
-        /* Scanlines effet rétro */
-        body::before {
-            content: "";
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 9999; 
-            background: 
-                repeating-linear-gradient(
-                    to bottom,
-                    rgba(255,255,255,0.04), 
-                    rgba(0,0,0,0.2) 1px,   
-                    transparent 2px          
-                );
-            background-size: 100% 4px; 
-            opacity: 0.3; 
-            animation: moveScanlines 5s linear infinite;
-        }
-        @keyframes moveScanlines {
-            from { background-position-y: 0; }
-            to   { background-position-y: 4px; }
-        }
+    /* =====  RESET + BASE  ===== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+        background:var(--clr-bg);
+        color:var(--clr-text);
+        font-family:var(--ff-body);
+        line-height:var(--lh-body);
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        overflow-x:hidden;
+    }
 
-        a{color:var(--clr-accent);text-decoration:none}
-        a:hover{color:#fff}
-        img{max-width:100%;display:block}
+    /* =====  SCANLINES LÉGÈRES  ===== */
+    body::before{
+        content:"";
+        position:fixed;
+        inset:0;
+        pointer-events:none;
+        z-index:9999;
+        background:repeating-linear-gradient(
+            to bottom,
+            rgba(0,240,255,.03) 0 1px,
+            transparent 1px 3px
+        );
+        animation:scan 2s linear infinite;
+    }
+    @keyframes scan{to{background-position:0 3px}}
 
-        /* ---------- Navbar Team Rocket ---------- */
-        .poke-banner{
-            display:flex; align-items:center; justify-content:space-between;
-            padding:2rem 3rem; background:#111; border-bottom:3px solid var(--clr-accent);
-        }
-        .poke-banner h1{
-            font-family:'Orbitron',sans-serif; font-size:2.2rem; color:var(--clr-accent);
-            text-shadow:0 0 6px var(--clr-accent);
-        }
-        .poke-nav{display:flex; align-items:center; gap:1rem; font-family:'Orbitron',sans-serif;}
-        .btn-nav{
-            padding:.55rem 1.1rem; border:2px solid var(--clr-accent);
-            background:rgba(0,0,0,.55); color:var(--clr-accent);
-            border-radius:6px; text-decoration:none; transition:.3s;
-            box-shadow:0 0 6px var(--clr-accent);
-        }
-        .btn-nav:hover{background:var(--clr-accent); color:#000;}
-        .nav-welcome{color:#fff; margin-right:.5rem;}
+    /* =====  NAVBAR GLASS  ===== */
+    .poke-banner{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:1.2rem 2rem;
+        background:rgba(0,0,0,.35);
+        border-bottom:2px solid var(--clr-primary);
+        backdrop-filter:blur(10px);
+    }
+    .poke-banner h1{
+        font-size:1.6rem;
+        color:var(--clr-primary);
+        text-shadow:0 0 8px;
+    }
+    .poke-nav{display:flex;gap:.8rem;font-size:.9rem}
+    .btn-nav{
+        padding:.5rem 1rem;
+        border:1px solid var(--clr-primary);
+        background:transparent;
+        color:var(--clr-primary);
+        border-radius:4px;
+        text-decoration:none;
+        transition:.25s;
+        box-shadow:0 0 6px -2px var(--clr-primary);
+    }
+    .btn-nav:hover{
+        background:var(--clr-primary);
+        color:#000;
+        box-shadow:0 0 12px 0 var(--clr-primary);
+    }
+    .nav-welcome{font-size:.8rem;color:#fff;margin-right:.5rem}
 
-        /* ---------- Footer ---------- */
-        footer{
-            background:#000;
-            padding:2rem 0;
-            text-align:center;
-            border-top:2px solid var(--clr-primary);
-            margin-top:auto;
-        }
-        .target-pkm{width:100px;image-rendering:pixelated}
+    /* =====  FOOTER  ===== */
+    footer{
+        margin-top:auto;
+        text-align:center;
+        padding:1.5rem 0;
+        font-size:.7rem;
+        color:var(--clr-primary);
+        text-shadow:0 0 4px;
+    }
     </style>
 
-    {% block stylesheets %}
-        {{ encore_entry_link_tags('app') }}
-    {% endblock %}
+    {% block stylesheets %}{{ encore_entry_link_tags('app') }}{% endblock %}
 </head>
 
 <body>
-    {# ---------- NAVBAR ---------- #}
     {% block navigation %}
     <nav class="poke-banner">
         <h1>Rejoignez les Teams de Vilains</h1>
-
         <div class="poke-nav">
             {% if app.user %}
                 <span class="nav-welcome">Salut, <strong>{{ app.user.codename }}</strong></span>
@@ -116,33 +114,8 @@
     </nav>
     {% endblock %}
 
-    {# ---------- CONTENU PRINCIPAL ---------- #}
-    <main id="root">
-        {% block body %}{% endblock %}
-    </main>
+    <main id="root">{% block body %}{% endblock %}</main>
 
-    {# ---------- FOOTER ---------- #}
-    {% block footer %}
-    <footer>
-        <div class="container text-center">
-            <h5 class="mb-2">Pokémon recherché actuellement par toutes les Teams</h5>
-            {% if targetPokemon %}
-                <p class="mb-1"><strong>{{ targetPokemon.name|capitalize }}</strong></p>
-                <img class="target-pkm" src="{{ targetPokemon.sprite }}" alt="{{ targetPokemon.name }}">
-                <p class="text-muted small mb-0">Types : {{ targetPokemon.types|join(', ') }}</p>
-            {% else %}
-                <p class="text-warning">Aucune cible n'est actuellement définie.</p>
-            {% endif %}
-        </div>
-    </footer>
-    {% endblock %}
-
-
-    {# Route pour le Webpack}
-    {# {% block javascripts %}
-        {{ encore_entry_script_tags('app') }}
-    {% endblock %} #}
-
-
+    {% block javascripts %}{% endblock %}
 </body>
 </html>

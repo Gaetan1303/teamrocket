@@ -1,94 +1,132 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Team Rocket & Co – Recrutement Ultime
-{% endblock %}
+{% block title %}Team Rocket & Co – Recrutement Ultime{% endblock %}
 
 {% block stylesheets %}
-	{{ parent() }}
-	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="{{ asset('/css/index.css') }}">
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/index.css') }}">
 {% endblock %}
 
 {% block body %}
-	<body class="dark-universe">
+<section class="scrolling-credo">
+    <div>
+        {% for team in teams %}
+            <span>« {{ team.credo }} »</span>
+        {% endfor %}
+    </div>
+</section>
 
-		<nav class="poke-nav">
-			{% if app.user %}
-				<span class="nav-welcome">
-					<strong>{{ app.user.teamVilain.name }}</strong>
-				</span>
-				<a href="{{ path('app_sbire_create') }}" class="btn-nav">Avatar</a>
-			{% endif %}
-		</nav>
+<section class="cta-cell">
+    <div class="dialog-box">
+        {% if not app.user %}
+            <p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
+            <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
+        {% else %}
+            <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
+            <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
+                <span class="btn-adventure__text">Commencez l'aventure !</span>
+                <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
+            </a>
+        {% endif %}
+    </div>
+</section>
 
-		<div class="scrolling-credo">
-			<div>
-				{% for team in teams %}
-					<span>«
-						{{ team.credo }}
-						»</span>
-				{% endfor %}
-			</div>
-		</div>
+<h2 class="pokeball-title">Index des organisations criminelles</h2>
+<div class="pokeball-ring">
 
-		{% if not app.user %}
-			<section class="cta-cell">
-				<div class="dialog-box">
-					<p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
-					<a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
-				</div>
-			</section>
-		{% endif %}
+    {% for team in teams %}
+        <label class="team-card" style="--c:{{ team.colorCode }}; --i:{{ loop.index0 }};">
+            <input type="checkbox" aria-hidden="true">
+            <img src="{{ asset('images/icones/' ~ (team.name|lower|replace({' ':'-','é':'e','è':'e','æ':'ae'})~'.png')) }}" alt="Logo {{ team.name }}" class="team-logo">
+            <div class="team-info">
+                <div class="team-name">{{ team.name }}</div>
+                <div class="team-region">Région : {{ team.region }}</div>
+            </div>
+        </label>
+    {% endfor %}
+</div>
 
-		<section class="teams-detail container">
-			<h3 class="text-center mb-5" style="font-family:'Orbitron',sans-serif;">Index des organisations criminelles</h3>
-			{% for team in teams %}
-				{% set filename = team.name|lower|replace({' ':'-', 'é':'e', 'è':'e', 'æ':'ae'}) ~ '.png' %}
-				<div class="team-card" style="--c:{{ team.colorCode }};">
-					<img src="{{ asset('/images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
-					<div class="team-info">
-						<div class="team-name" style="color:{{ team.colorCode }};">{{ team.name }}</div>
-						<div class="team-region">Région :
-							{{ team.region }}</div>
-						<div class="team-credo">«
-							{{ team.credo }}
-							»</div>
-					</div>
-				</div>
-			{% endfor %}
-		</section>
-
-		{# ---  CHAT WIDGET (connectés uniquement)  --- #}
-		{% if app.user %}
-			<section class="global-chat mt-5">
-				<h3 class="text-center" style="font-family:'Orbitron',sans-serif;">Tu veux communiquer avec les autres sbires ? =></h3>
-				{{ include('chat_widget/chatwidget.html.twig', {
+{% if app.user %}
+    <section class="global-chat mt-5">
+        <h3 class="text-center" style="font-family:'Orbitron',sans-serif;">Tu veux communiquer avec les autres sbires ?</h3>
+        {{ include('chat_widget/chatwidget.html.twig', {
             channels:    channels,
             mercure_url: mercure_url,
             mercure_jwt: mercure_jwt
         }) }}
-			</section>
-		{% endif %}
-
-		<script>
-			document.addEventListener('DOMContentLoaded', () => {
-const p = document.querySelector('.typewriter');
-if (! p) 
-return;
-
-const text = p.dataset.text;
-p.classList.add('typing');
-let i = 0;
-const interval = setInterval(() => {
-p.textContent += text[i++];
-if (i === text.length) 
-clearInterval(interval);
-
-}, 40);
-});
-		</script>
-	</body>
+    </section>
+{% endif %}
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
-{% block footer %}{% endblock %}
+{% block javascripts %}
+
+<script>
+/* === Effet machine à écrire === */
+document.querySelectorAll('.typewriter').forEach(el=>{
+    const txt=el.dataset.text, delay=45;
+    let i=0;
+    el.classList.add('typing');
+    (function type(){
+        el.textContent=txt.slice(0,++i);
+        if(i<=txt.length) setTimeout(type,delay+Math.random()*20);
+    })();
+});
+
+/* === Animation centrale dynamique — badge Pokémon === */
+const ring = document.querySelector('.pokeball-ring');
+let currentClone = null;
+
+/* --- OUVERTURE / REMPLACEMENT --- */
+ring.addEventListener('click', e => {
+    const card = e.target.closest('.team-card');
+    if (!card) return;
+
+    const info  = card.querySelector('.team-info');
+    const color = getComputedStyle(card).getPropertyValue('--c');
+    const logo  = card.querySelector('.team-logo').cloneNode(true);
+
+    /* S’il y a déjà un badge, on le remplace directement */
+    if (currentClone) {
+        currentClone.remove();
+        currentClone = null;
+    }
+
+    /* Création du badge central */
+    currentClone = document.createElement('div');
+    currentClone.id = 'pokeball-clone';
+    currentClone.style.setProperty('--c', color);
+
+    /* contenu du badge */
+    currentClone.appendChild(logo);
+    currentClone.appendChild(info.cloneNode(true));
+
+    document.body.appendChild(currentClone);
+
+    /* Animation d’apparition */
+    currentClone.style.animation = 'pokeballBadgeAppear 0.9s cubic-bezier(.68,-0.55,.27,1.55) forwards';
+
+    /* Fermeture au clic sur le badge */
+    currentClone.addEventListener('click', () => {
+        currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+        setTimeout(() => {
+            currentClone.remove();
+            currentClone = null;
+        }, 450);
+    });
+});
+
+/* Fermeture si clic à l’extérieur */
+document.addEventListener('click', e => {
+    if (currentClone && !e.target.closest('#pokeball-clone') && !e.target.closest('.team-card')) {
+        currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+        setTimeout(() => {
+            currentClone.remove();
+            currentClone = null;
+        }, 450);
+    }
+});
+</script>
+
+
+{% endblock %}
