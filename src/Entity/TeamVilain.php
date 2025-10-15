@@ -28,7 +28,10 @@ class TeamVilain
     private ?string $colorCode = null;
 
     #[ORM\Column(length: 20, unique: true)]
-    private ?string $code = null;               
+    private ?string $code = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $logo = null;               // <-- NEW
 
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'teamVilain')]
     private Collection $sbires;
@@ -97,6 +100,17 @@ class TeamVilain
     public function setCode(string $code): static
     {
         $this->code = $code;
+        return $this;
+    }
+
+    public function getLogo(): ?string               // <-- NEW
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): static    // <-- NEW
+    {
+        $this->logo = $logo;
         return $this;
     }
 

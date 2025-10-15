@@ -9,42 +9,76 @@
 {% endblock %}
 
 {% block body %}
-<section class="scrolling-credo">
-    <div>
+
+<!-- ===== BARRES LATÉRALES ===== -->
+<aside class="sidebar-panel sidebar-left">
+    <h3 class="sidebar-title">Système</h3>
+    <div class="system-gauge">
+        <div class="gauge-bar">
+            <div id="reactor-fill" class="gauge-fill"></div>
+        </div>
+        <div id="gauge-level" class="gauge-label">--</div>
+    </div>
+
+    <h3 class="sidebar-title">Log données</h3>
+    <div id="data-log" class="data-log"></div>
+</aside>
+
+<aside class="sidebar-panel sidebar-right">
+    <h3 class="sidebar-title">Flux données</h3>
+    <div class="matrix-feed">
+        <pre id="matrix-content" class="matrix-content"></pre>
+    </div>
+
+    <h3 class="sidebar-title">Horloge</h3>
+    <div id="time-display" class="gauge-label">--:--:--</div>
+</aside>
+<!-- ===== FIN BARRES LATÉRALES ===== -->
+
+<!-- Contenu principal centré -->
+<div class="app-content">
+
+    <!-- Bandeau défilant des Credos -->
+    <section class="scrolling-credo">
+        <div>
+            {% for team in teams %}
+                <span>« {{ team.credo }} »</span>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Cellule d'appel à l'action (CTA) -->
+    <section class="cta-cell">
+        <div class="dialog-box">
+            {% if not app.user %}
+                <p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
+                <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
+            {% else %}
+                <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
+                <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
+                    <span class="btn-adventure__text">Commencez l'aventure !</span>
+                    <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+    <h2 class="pokeball-title">Index des organisations criminelles</h2>
+    <div class="pokeball-ring">
+
         {% for team in teams %}
-            <span>« {{ team.credo }} »</span>
+            <!-- La variable --c est définie dynamiquement par Twig pour chaque Team -->
+            <label class="team-card" style="--c:{{ team.colorCode }}; --i:{{ loop.index0 }};">
+                <input type="checkbox" aria-hidden="true">
+                <!-- Utilisation de team.name pour construire le chemin de l'image -->
+                <img src="{{ asset('images/icones/' ~ (team.name|lower|replace({' ':'-','é':'e','è':'e','æ':'ae'})~'.png')) }}" alt="Logo {{ team.name }}" class="team-logo">
+                <div class="team-info">
+                    <div class="team-name">{{ team.name }}</div>
+                    <div class="team-region">Région : {{ team.region }}</div>
+                </div>
+            </label>
         {% endfor %}
     </div>
-</section>
-
-<section class="cta-cell">
-    <div class="dialog-box">
-        {% if not app.user %}
-            <p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
-            <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
-        {% else %}
-            <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
-            <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
-                <span class="btn-adventure__text">Commencez l'aventure !</span>
-                <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
-            </a>
-        {% endif %}
-    </div>
-</section>
-
-<h2 class="pokeball-title">Index des organisations criminelles</h2>
-<div class="pokeball-ring">
-
-    {% for team in teams %}
-        <label class="team-card" style="--c:{{ team.colorCode }}; --i:{{ loop.index0 }};">
-            <input type="checkbox" aria-hidden="true">
-            <img src="{{ asset('images/icones/' ~ (team.name|lower|replace({' ':'-','é':'e','è':'e','æ':'ae'})~'.png')) }}" alt="Logo {{ team.name }}" class="team-logo">
-            <div class="team-info">
-                <div class="team-name">{{ team.name }}</div>
-                <div class="team-region">Région : {{ team.region }}</div>
-            </div>
-        </label>
-    {% endfor %}
 </div>
 
 {% if app.user %}
@@ -60,73 +94,313 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
 
-<script>
-/* === Effet machine à écrire === */
-document.querySelectorAll('.typewriter').forEach(el=>{
-    const txt=el.dataset.text, delay=45;
-    let i=0;
-    el.classList.add('typing');
-    (function type(){
-        el.textContent=txt.slice(0,++i);
-        if(i<=txt.length) setTimeout(type,delay+Math.random()*20);
-    })();
-});
+    <script>
+    // ==========================================================
+    // UTILS : ANIMATIONS ET LOGIQUE
+    // ==========================================================
 
-/* === Animation centrale dynamique — badge Pokémon === */
-const ring = document.querySelector('.pokeball-ring');
-let currentClone = null;
-
-/* --- OUVERTURE / REMPLACEMENT --- */
-ring.addEventListener('click', e => {
-    const card = e.target.closest('.team-card');
-    if (!card) return;
-
-    const info  = card.querySelector('.team-info');
-    const color = getComputedStyle(card).getPropertyValue('--c');
-    const logo  = card.querySelector('.team-logo').cloneNode(true);
-
-    /* S’il y a déjà un badge, on le remplace directement */
-    if (currentClone) {
-        currentClone.remove();
-        currentClone = null;
-    }
-
-    /* Création du badge central */
-    currentClone = document.createElement('div');
-    currentClone.id = 'pokeball-clone';
-    currentClone.style.setProperty('--c', color);
-
-    /* contenu du badge */
-    currentClone.appendChild(logo);
-    currentClone.appendChild(info.cloneNode(true));
-
-    document.body.appendChild(currentClone);
-
-    /* Animation d’apparition */
-    currentClone.style.animation = 'pokeballBadgeAppear 0.9s cubic-bezier(.68,-0.55,.27,1.55) forwards';
-
-    /* Fermeture au clic sur le badge */
-    currentClone.addEventListener('click', () => {
-        currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
-        setTimeout(() => {
-            currentClone.remove();
-            currentClone = null;
-        }, 450);
+    /* === Effet machine à écrire (Typewriter effect) === */
+    document.querySelectorAll('.typewriter').forEach(el=>{
+        const txt=el.dataset.text, delay=45;
+        let i=0;
+        el.classList.add('typing');
+        (function type(){
+            el.textContent=txt.slice(0,++i);
+            if(i<=txt.length) setTimeout(type,delay+Math.random()*20);
+        })();
     });
-});
 
-/* Fermeture si clic à l’extérieur */
-document.addEventListener('click', e => {
-    if (currentClone && !e.target.closest('#pokeball-clone') && !e.target.closest('.team-card')) {
-        currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
-        setTimeout(() => {
+    /* === Animation centrale dynamique — badge Pokémon === */
+    const ring = document.querySelector('.pokeball-ring');
+    let currentClone = null;
+
+    /* --- OUVERTURE / REMPLACEMENT --- */
+    ring.addEventListener('click', e => {
+        const card = e.target.closest('.team-card');
+        if (!card) return;
+
+        const info  = card.querySelector('.team-info');
+        const color = getComputedStyle(card).getPropertyValue('--c');
+        const logo  = card.querySelector('.team-logo').cloneNode(true);
+
+        /* S’il y a déjà un badge, on le remplace directement */
+        if (currentClone) {
             currentClone.remove();
             currentClone = null;
-        }, 450);
-    }
-});
-</script>
+        }
 
+        /* Création du badge central */
+        currentClone = document.createElement('div');
+        currentClone.id = 'pokeball-clone';
+        currentClone.style.setProperty('--c', color);
 
+        /* contenu du badge */
+        currentClone.appendChild(logo);
+        currentClone.appendChild(info.cloneNode(true));
+
+        document.body.appendChild(currentClone);
+
+        /* Animation d’apparition */
+        currentClone.style.animation = 'pokeballBadgeAppear 0.9s cubic-bezier(.68,-0.55,.27,1.55) forwards';
+
+        /* Fermeture au clic sur le badge */
+        currentClone.addEventListener('click', () => {
+            currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+            setTimeout(() => {
+                currentClone.remove();
+                currentClone = null;
+            }, 450);
+        });
+    });
+
+    /* Fermeture si clic à l’extérieur */
+    document.addEventListener('click', e => {
+        if (currentClone && !e.target.closest('#pokeball-clone') && !e.target.closest('.team-card')) {
+            currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+            setTimeout(() => {
+                currentClone.remove();
+                currentClone = null;
+            }, 450);
+        }
+    });
+        // Data pour le JS (utilisé pour les animations de position)
+        const teamData = [
+            {% for team in teams %}
+                {
+                    name: '{{ team.name }}',
+                    logo: '{{ asset('images/icones/' ~ (team.name|lower|replace({' ':'-','é':'e','è':'e','æ':'ae'})~'.png')) }}',
+                    color: 'var(--{{ team.name|lower }})'
+                },
+            {% endfor %}
+        ];
+
+        // ==========================================================
+        // UTILS : CALCUL ET ANIMATIONS
+        // ==========================================================
+
+        /**
+         * Fonction de d'animation d'écriture (Typewriter effect)
+         * @param {HTMLElement} element - L'élément HTML à animer
+         */
+        function typeWriter(element) {
+            const text = element.dataset.text;
+            let i = 0;
+            element.textContent = '';
+            element.classList.add('typing');
+
+            const speed = 50; // Vitesse de frappe en ms
+
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.classList.remove('typing');
+                }
+            }
+            type();
+        }
+
+        // ==========================================================
+        // GAUGE ET LOGIQUE D'ENVIRONNEMENT
+        // ==========================================================
+
+        /**
+         * Met à jour la jauge de réacteur et le log de données
+         */
+        function updateReactorStatus() {
+            const fill = document.getElementById('reactor-fill');
+            const levelLabel = document.getElementById('gauge-level');
+            const log = document.getElementById('data-log');
+
+            // Simule une fluctuation de 50% à 95%
+            const currentLevel = Math.floor(Math.random() * 45) + 50;
+
+            fill.style.width = currentLevel + '%';
+
+            let status;
+            if (currentLevel < 60) {
+                status = 'Alerte Mineure';
+                fill.style.backgroundColor = 'var(--neon-yellow)';
+                fill.style.boxShadow = '0 0 8px var(--neon-yellow)';
+            } else if (currentLevel > 90) {
+                status = 'Surchauffe';
+                fill.style.backgroundColor = 'var(--neon-red)';
+                fill.style.boxShadow = '0 0 8px var(--neon-red)';
+            } else {
+                status = 'Optimal';
+                fill.style.backgroundColor = 'var(--clr-neon-cyan)';
+                fill.style.boxShadow = '0 0 8px var(--clr-neon-cyan)';
+            }
+
+            levelLabel.innerHTML = `${currentLevel}% (${status})`;
+
+            // Ajout au log (garde seulement les 10 dernières lignes)
+            const now = new Date();
+            const time = now.toTimeString().substring(0, 8);
+            const newLogEntry = document.createElement('p');
+            newLogEntry.innerHTML = `[${time}] Réacteur: Niveau de puissance ${currentLevel}%. ${status}.`;
+            log.prepend(newLogEntry);
+
+            while (log.children.length > 10) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        /**
+         * Génère et fait défiler un flux de données style Matrix
+         */
+        function startMatrixFeed() {
+            const matrixContent = document.getElementById('matrix-content');
+            const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+=-{}[]:;"\\|<,>.?/~`';
+            const lineCount = 40;
+            const charPerLine = 35;
+            let content = '';
+
+            for (let i = 0; i < lineCount; i++) {
+                let line = '';
+                for (let j = 0; j < charPerLine; j++) {
+                    line += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                content += line + '\n';
+            }
+            matrixContent.textContent = content;
+        }
+
+        /**
+         * Met à jour l'horloge
+         */
+        function updateTime() {
+            const timeDisplay = document.getElementById('time-display');
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            timeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // ==========================================================
+        // POSITIONNEMENT DES CARTES AUTOUR DU CERCLE
+        // ==========================================================
+
+        /**
+         * Positionne les cartes autour du cercle Pokeball
+         */
+        function positionCards() {
+            const container = document.querySelector('.pokeball-ring');
+            const cards = document.querySelectorAll('.team-card');
+            const numCards = cards.length;
+            const radius = container.offsetWidth / 2 - cards[0].offsetWidth / 2;
+            const angleStep = (2 * Math.PI) / numCards; // Angle en radians
+
+            cards.forEach((card, index) => {
+                const angle = angleStep * index;
+                // Calcul de la position (décalage de 90 degrés pour commencer en haut)
+                const x = radius * Math.cos(angle - Math.PI / 2);
+                const y = radius * Math.sin(angle - Math.PI / 2);
+
+                // Applique les transformations de translation
+                card.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        }
+
+        // ==========================================================
+        // LOGIQUE PRINCIPALE
+        // ==========================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Démarrer l'effet Typewriter
+            const typewriterElement = document.getElementById('typewriter-text');
+            if(typewriterElement) {
+                typeWriter(typewriterElement);
+            }
+
+            // 2. Positionner les cartes
+            positionCards();
+            window.addEventListener('resize', positionCards);
+
+            // 3. Démarrer les mises à jour de l'environnement
+            updateReactorStatus();
+            setInterval(updateReactorStatus, 8000); // Mise à jour de la jauge toutes les 8s
+
+            startMatrixFeed();
+
+            updateTime();
+            setInterval(updateTime, 1000); // Mise à jour de l'heure
+
+            // 4. Gestion des clics sur les cartes
+            const teamCards = document.querySelectorAll('.team-card');
+            let currentClone = null; // Référence à l'élément de badge central
+
+            teamCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const checkbox = card.querySelector('input[type="checkbox"]');
+                    const info = card.querySelector('.team-info');
+                    const color = getComputedStyle(card).getPropertyValue('--c');
+                    // Cloner le logo et retirer le style pour ne pas cloner le hover
+                    const logo  = card.querySelector('.team-logo').cloneNode(true);
+                    logo.style.transform = 'none';
+
+                    /* Si on clique sur une carte DÉCOCHÉE ou s'il n'y a pas de clone */
+                    if (checkbox.checked || !currentClone) {
+
+                        /* S’il y a déjà un badge, on le remplace directement (dissolvance rapide) */
+                        if (currentClone) {
+                            currentClone.remove();
+                            currentClone = null;
+                        }
+
+                        /* Création du badge central */
+                        currentClone = document.createElement('div');
+                        currentClone.id = 'pokeball-clone';
+                        currentClone.style.setProperty('--c', color);
+
+                        /* contenu du badge */
+                        currentClone.appendChild(logo);
+
+                        // Cloner les éléments de texte (nom et région)
+                        const nameElement = info.querySelector('.team-name').cloneNode(true);
+                        const regionElement = info.querySelector('.team-region').cloneNode(true);
+                        currentClone.appendChild(nameElement);
+                        currentClone.appendChild(regionElement);
+
+                        document.body.appendChild(currentClone);
+
+                        /* Animation d’apparition */
+                        currentClone.style.animation = 'pokeballBadgeAppear 0.9s cubic-bezier(.68,-0.55,.27,1.55) forwards';
+
+                        /* Fermeture au clic sur le badge */
+                        currentClone.addEventListener('click', () => {
+                            if (currentClone) {
+                                currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+                                // Décocher la checkbox active (s'il y en a une)
+                                teamCards.forEach(c => c.querySelector('input[type="checkbox"]').checked = false);
+
+                                setTimeout(() => {
+                                    currentClone.remove();
+                                    currentClone = null;
+                                }, 450);
+                            }
+                        });
+                    }
+                });
+            });
+
+            /* Fermeture si clic à l’extérieur (et défilement) */
+            document.addEventListener('click', e => {
+                if (currentClone && !e.target.closest('#pokeball-clone') && !e.target.closest('.team-card')) {
+                    currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+                    // Décocher la checkbox active (s'il y en a une)
+                    teamCards.forEach(c => c.querySelector('input[type="checkbox"]').checked = false);
+                    setTimeout(() => {
+                        currentClone.remove();
+                        currentClone = null;
+                    }, 450);
+                }
+            });
+        });
+    </script>
 {% endblock %}

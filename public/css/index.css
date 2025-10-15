@@ -11,32 +11,194 @@
     --clr-glass:rgba(0,0,0,.55);
     --ff-title:'Orbitron',monospace;
     --ff-body:'Roboto',sans-serif;
+    --neon-red: #ff3333;
+    --neon-yellow: #ffcc00;
 }
 
-body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") center center/500px auto fixed}
+/* Base Body Style */
+body {
+    color: #fff;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: var(--ff-body);
+    overflow-x: hidden;
+    position: relative;
+    
+}
 
 /* ==========================================================
-   BANDEAU DÉFILANT (ORIGINE)
+   BARRES LATÉRALES (GUTTER)
    ========================================================== */
-.scrolling-credo{
-    overflow:hidden;
-    white-space:nowrap;
-    background:#000;
-    border-top:3px solid var(--clr-neon-cyan);
-    border-bottom:3px solid var(--clr-neon-cyan);
-    padding:1rem 0;
-    font-family:var(--ff-title);
-    font-size:1.1rem;
-    letter-spacing:1px;
-    color:var(--clr-neon-cyan);
-    text-shadow:0 0 4px var(--clr-neon-cyan);
+.sidebar-panel {
+    position: fixed;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    padding: 2rem 1rem;
+    font-family: var(--ff-body);
+    color: var(--clr-neon-cyan);
+    z-index: 99;
+    pointer-events: none; /* Ne pas bloquer le clic sur le contenu central */
+    display: none; /* Caché par défaut */
+}
+
+/* Affichage des barres latérales sur écrans plus larges */
+@media (min-width: 900px) { /* Apparaît à 900px */
+    .sidebar-panel { display: block; }
+    /* Ajouter un padding au body pour décaler le contenu central */
+    body { padding-left: 250px; padding-right: 250px; }
+}
+
+/* Positionnement des barres */
+.sidebar-left {
+    left: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.8), transparent);
+    border-right: 2px solid var(--clr-neon-cyan);
+    box-shadow: 2px 0 10px rgba(0, 240, 255, 0.4);
+}
+.sidebar-right {
+    right: 0;
+    text-align: right;
+    background: linear-gradient(to left, rgba(0,0,0,0.8), transparent);
+    border-left: 2px solid var(--clr-neon-cyan);
+    box-shadow: -2px 0 10px rgba(0, 240, 255, 0.4);
+}
+
+/* Titre de section des barres */
+.sidebar-title {
+    font-family: var(--ff-title);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--clr-neon-magenta);
+    text-shadow: 0 0 5px var(--clr-neon-magenta);
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+    padding-bottom: 0.5rem;
+}
+.sidebar-right .sidebar-title {
+    text-align: right;
+}
+
+/* Log de données / Console */
+.data-log {
+    font-size: 0.7rem;
+    line-height: 1.5;
+    opacity: 0.6;
+    height: 25vh; /* Hauteur ajustée */
+    overflow: hidden;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+.sidebar-right .data-log {
+    text-align: right;
+}
+.data-log p { margin-bottom: 0.2rem; }
+
+/* Ajustement pour le contenu central */
+.app-content {
+    max-width: 1000px; 
+    margin: 0 auto; 
+    padding-top: 1px;
+    width: 100%; 
+}
+
+/* ==========================================================
+   JAUGE D'ÉNERGIE
+   ========================================================== */
+.system-gauge {
+    border: 1px solid var(--clr-neon-cyan);
+    padding: 0.5rem;
+    background: rgba(0,0,0,0.6);
+    border-radius: 4px;
+    box-shadow: inset 0 0 5px var(--clr-neon-cyan);
+    pointer-events: auto; /* Permet l'interaction si besoin */
+}
+.gauge-bar {
+    height: 15px;
+    width: 100%;
+    background: var(--clr-bg);
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+}
+.gauge-fill {
+    height: 100%;
+    width: 0;
+    background-color: var(--clr-neon-cyan);
+    box-shadow: 0 0 8px var(--clr-neon-cyan);
+    transition: width 0.5s ease-out, background-color 0.5s ease-out, box-shadow 0.5s ease-out;
+    animation: gaugePulse 4s infinite alternate;
+}
+@keyframes gaugePulse {
+    0% { filter: brightness(1.0); }
+    100% { filter: brightness(1.2); }
+}
+.gauge-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-family: var(--ff-title);
+    color: var(--clr-neon-magenta);
+    text-shadow: 0 0 4px var(--clr-neon-magenta);
+}
+
+/* ==========================================================
+   FLUX DE DONNÉES MATRIX
+   ========================================================== */
+.matrix-feed {
+    font-family: monospace;
+    font-size: 0.7rem;
+    color: #10B981; /* Vert aether/matrix pour le code */
+    height: 60vh; 
+    overflow: hidden;
+    position: relative;
+    text-shadow: 0 0 5px #10B98155;
+    border: 1px solid #10B98155;
+    padding: 10px;
+    background: rgba(0,0,0,0.7);
+}
+.matrix-content {
+    white-space: pre; 
+    position: absolute;
+    width: 100%;
+    animation: matrixScroll 15s linear infinite;
+}
+@keyframes matrixScroll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-70%); }
+}
+
+
+/* ==========================================================
+   BANDEAU DÉFILANT – TOUCHE LES BARRES LATÉRALES
+   ========================================================== */
+.scrolling-credo {
+    position: relative;
+    width: 74vw; /* pleine largeur de la fenêtre */
+    left: 50%;
+    transform: translateX(-50%); /* centre le bandeau */
+    overflow: hidden;
+    white-space: nowrap;
+    background: #000;
+    border-top: 3px solid var(--clr-neon-cyan);
+    border-bottom: 3px solid var(--clr-neon-cyan);
+    padding: 1rem 0;
+    font-family: var(--ff-title);
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--clr-neon-cyan);
+    text-shadow: 0 0 4px var(--clr-neon-cyan);
+    margin-top: 3rem;
 }
 .scrolling-credo div{display:inline-block;padding-left:100%;animation:scroll-left 60s linear infinite}
 @keyframes scroll-left{to{transform:translateX(-100%)}}
 .scrolling-credo span{margin-right:5rem}
 
 /* ==========================================================
-   CTA CELL (ORIGINE)
+   CTA CELL
    ========================================================== */
 .cta-cell{display:grid;place-content:center;padding:4rem 1rem}
 .dialog-box{position:relative;background:rgba(0,0,0,.75);border:3px solid var(--clr-neon-cyan);border-radius:12px;padding:2rem 3rem;max-width:600px;text-align:center;box-shadow:0 0 12px var(--clr-neon-cyan),inset 0 0 8px var(--clr-neon-cyan);animation:borderPulse 2s infinite}
@@ -44,11 +206,11 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 .typewriter{font-family:var(--ff-title);font-size:1.3rem;color:var(--clr-neon-cyan);min-height:3.2rem}
 .typewriter.typing::after{content:'▌';animation:blink 1s infinite}
 @keyframes blink{50%{opacity:0}}
-.btn-cta{display:inline-block;margin-top:1.5rem;background:var(--clr-neon-cyan);color:#000;font-size:1.1rem;font-weight:bold;padding:0.9rem 2rem;border:none;border-radius:8px;box-shadow:0 0 8px rgba(255,204,0,.5);animation:pulseBtn 1.5s infinite;transition:.3s}
+.btn-cta{display:inline-block;margin-top:1.5rem;background:var(--clr-neon-cyan);color:#000;font-size:1.1rem;font-weight:bold;padding:0.9rem 2rem;border:none;border-radius:8px;box-shadow:0 0 8px rgba(255,204,0,.5);animation:pulseBtn 1.5s infinite;transition:.3s; cursor:pointer;}
 .btn-cta:hover{transform:translateY(-2px);box-shadow:0 0 15px #ffcc00}
 @keyframes pulseBtn{50%{transform:scale(1.05)}}
 
-.btn-adventure{display:inline-block;margin-top:1rem;padding:.55rem 1.2rem;background:transparent;color:var(--clr-neon-cyan);font-family:var(--ff-title);font-size:1rem;font-weight:700;border:2px solid var(--clr-neon-cyan);border-radius:6px;text-decoration:none;position:relative;overflow:hidden;transition:.3s;box-shadow:0 0 8px rgba(255,204,0,.6)}
+.btn-adventure{display:inline-block;margin-top:1rem;padding:.55rem 1.2rem;background:transparent;color:var(--clr-neon-cyan);font-family:var(--ff-title);font-size:1rem;font-weight:700;border:2px solid var(--clr-neon-cyan);border-radius:6px;text-decoration:none;position:relative;overflow:hidden;transition:.3s;box-shadow:0 0 8px rgba(255,204,0,.6); cursor:pointer;}
 .btn-adventure:hover{background:var(--clr-neon-cyan);color:#000;box-shadow:0 0 16px var(--clr-neon-cyan)}
 .btn-adventure .btn-adventure__glitch{position:absolute;inset:0;opacity:0;pointer-events:none}
 .btn-adventure:hover .btn-adventure__glitch{opacity:.8;animation:glitch .25s infinite}
@@ -57,6 +219,7 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
    TITRE SECTION
    ========================================================== */
 .pokeball-title{
+    
     text-align:center;
     margin:3rem 0 1rem;
     font-family:var(--ff-title);
@@ -69,13 +232,19 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 /* ==========================================================
    CERCLE POKEBALL – 10 TEAMS
    ========================================================== */
-.pokeball-ring{
-    position:relative;
-    width:600px;
-    height:600px;
-    margin:2rem auto;
-    display:grid;
-    place-content:center;
+/* ==========================================================
+   CERCLE POKEBALL – IMAGE DE FOND DERRIÈRE LES CARTES
+   ========================================================== */
+.pokeball-ring {
+    position: relative;
+    width: 600px;                  /* ajuste si besoin */
+    height: 600px;
+    margin: 2rem auto;
+    display: grid;
+    place-content: center;
+    background: var(--clr-bg) url("../images/pokeball-bg.png") center center / 280px auto no-repeat;
+    border-radius: 50%;            /* cercle visible si tu veux un contour */
+    /* (optionnel) border: 2px solid var(--clr-neon-cyan); */
 }
 .pokeball-center{
     position:absolute;
@@ -92,19 +261,14 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 
 /* ----- 10 cartes-cercles ----- */
 .team-card{
-    --angle:calc(360deg / 10 * var(--i));
     position:absolute;
     inset:0;
     width:150px;
     height:150px;
     border-radius:50%;
     margin:auto;
-    transform:
-        rotate(var(--angle))
-        translateY(-260px)
-        rotate(calc(-1 * var(--angle)));
     background:radial-gradient(circle at 30% 30%, #fff2, transparent 40%), var(--clr-glass);
-    border:3px solid var(--c);
+    border:3px solid var(--c); /* Couleur dynamique */
     display:grid;
     place-content:center;
     cursor:pointer;
@@ -112,13 +276,10 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     z-index:10;
 }
 .team-card:hover{
-    transform:
-        rotate(var(--angle))
-        translateY(-260px)
-        rotate(calc(-1 * var(--angle)))
-        scale(1.1);
     box-shadow:0 0 25px 4px var(--c), 0 0 45px -5px var(--clr-neon-magenta);
 }
+
+/* Transformation appliquée par JS pour simuler Twig */
 
 /* ----- checkbox hack ----- */
 .team-card input{
@@ -155,7 +316,6 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     50%{transform:scale(1.3) rotate(180deg); opacity:.8}
     100%{transform:scale(1) rotate(360deg); opacity:1}
 }
-
 /* ----- fermeture au reclic ----- */
 .team-card input:checked{
     position:fixed;
@@ -188,121 +348,34 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     text-shadow:0 0 6px var(--c);
 }
 .team-region{font-size:.65rem; opacity:.75}
-.team-credo{font-size:.6rem; font-style:italic; margin-top:.2rem; opacity:.9; line-height:1.3}
 
 /* ==========================================================
    RESPONSIVE – MOBILE
    ========================================================== */
+@media (max-width:900px){ /* Mobile layout */
+    .pokeball-ring{width:90vw; height:90vw}
+    .team-card{width:110px; height:110px;}
+    body { padding-left: 0; padding-right: 0; } /* Retirer le padding des barres */
+}
 @media (max-width:700px){
     .pokeball-ring{width:90vw; height:90vw}
-    .team-card{width:110px; height:110px; transform:rotate(var(--angle)) translateY(-42vw) rotate(calc(-1 * var(--angle)))}
+    .team-card{width:110px; height:110px;}
 }
 
-/* ==========================================================
-   CHAT GLOBAL
-   ========================================================== */
-.global-chat{max-width:800px;margin:3rem auto 4rem;background:#111;border:2px solid var(--clr-neon-cyan);border-radius:12px;padding:1.5rem;box-shadow:0 0 12px var(--clr-neon-cyan)}
-.global-chat h3{color:var(--clr-neon-cyan);margin-bottom:1rem;text-shadow:0 0 6px var(--clr-neon-cyan)}
-.chat-messages{height:250px;overflow-y:auto;background:#000;border:1px solid #333;border-radius:6px;padding:.5rem;margin:.5rem 0;font-size:.8rem}
-.chat-form{display:flex;gap:.5rem}
-.chat-form input{flex:1;padding:.5rem;border:1px solid #555;border-radius:4px;background:#222;color:#fff}
-.chat-form button{padding:.5rem .9rem;border:none;border-radius:4px;background:var(--clr-neon-cyan);color:#000;font-weight:bold;cursor:pointer;transition:.3s}
-.chat-form button:hover{background:#ffdd33}
-/* ==========================================================
-   ANIMATION DYNAMIQUE — BADGE POKÉMON CENTRAL
-   ========================================================== */
-@keyframes pokeballBadgePop {
-    0% {
-        transform: scale(0) rotate(0deg);
-        opacity: 0;
-        filter: blur(10px);
-    }
-    40% {
-        transform: scale(1.4) rotate(180deg);
-        opacity: 0.9;
-        filter: blur(2px);
-    }
-    70% {
-        transform: scale(0.9) rotate(270deg);
-        opacity: 1;
-        filter: blur(0);
-    }
-    100% {
-        transform: scale(1) rotate(360deg);
-    }
-}
-
-/* Style du badge central */
-#pokeball-clone {
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    text-align: center;
-    font-family: var(--ff-title);
-    color: var(--clr-neon-cyan);
-    background: radial-gradient(circle at 30% 30%, #ffffff20, transparent 60%), var(--clr-glass);
-    box-shadow:
-        0 0 25px var(--clr-neon-cyan),
-        0 0 60px var(--clr-neon-magenta),
-        inset 0 0 25px var(--clr-neon-cyan);
-    animation: pokeballBadgePop 0.8s cubic-bezier(.68,-0.55,.27,1.55);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(12px);
-    transition: transform .3s, box-shadow .3s;
-}
-
-#pokeball-clone:hover {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow:
-        0 0 40px var(--clr-neon-magenta),
-        0 0 80px var(--clr-neon-cyan),
-        inset 0 0 30px var(--clr-neon-magenta);
-}
-
-/* Texte à l’intérieur du badge */
-#pokeball-clone .team-name {
-    font-size: 1.1rem;
-    color: var(--clr-neon-cyan);
-    text-shadow: 0 0 10px var(--clr-neon-magenta);
-    margin-top: .4rem;
-}
-#pokeball-clone .team-region {
-    font-size: .8rem;
-    opacity: .8;
-}
 /* ==========================================================
    BADGE DE LIGUE POKÉMON – STYLE & ANIMATIONS
    ========================================================== */
-
-/* Apparition / disparition */
 @keyframes pokeballBadgeAppear {
-    0% {
-        transform: scale(0) rotate(0deg);
-        opacity: 0;
-        filter: blur(10px);
-    }
-    40% {
-        transform: scale(1.4) rotate(180deg);
-        opacity: 1;
-        filter: blur(2px);
-    }
-    70% {
-        transform: scale(0.9) rotate(270deg);
-        filter: blur(0);
-    }
-    100% {
-        transform: scale(1) rotate(360deg);
-    }
+    0% { transform: scale(0) rotate(0deg); opacity: 0; filter: blur(10px); }
+    40% { transform: scale(1.4) rotate(180deg); opacity: 1; filter: blur(2px); }
+    70% { transform: scale(0.9) rotate(270deg); filter: blur(0); }
+    100% { transform: scale(1) rotate(360deg); }
 }
 @keyframes pokeballBadgeDisappear {
     from { transform: scale(1) rotate(0); opacity: 1; }
     to   { transform: scale(0) rotate(-180deg); opacity: 0; }
 }
 
-/* Style du badge */
 #pokeball-clone {
     position: fixed;
     inset: 0;
@@ -314,10 +387,7 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
         radial-gradient(circle at 30% 30%, #ffffff33, transparent 70%),
         conic-gradient(from 0deg, var(--c), var(--clr-neon-magenta), var(--c));
     border: 4px solid var(--c);
-    box-shadow:
-        0 0 30px var(--c),
-        0 0 80px var(--clr-neon-magenta),
-        inset 0 0 30px var(--clr-neon-cyan);
+    box-shadow: 0 0 30px var(--c), 0 0 80px var(--clr-neon-magenta), inset 0 0 30px var(--clr-neon-cyan);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -339,34 +409,21 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     animation: rotateLight 3s linear infinite;
     opacity: 0.5;
 }
-@keyframes rotateLight {
-    to { transform: rotate(360deg); }
-}
+@keyframes rotateLight { to { transform: rotate(360deg); } }
 @keyframes spinHalo {
     0% { box-shadow: 0 0 25px var(--c), 0 0 60px var(--clr-neon-magenta), inset 0 0 25px var(--clr-neon-cyan); }
     50% { box-shadow: 0 0 40px var(--clr-neon-magenta), 0 0 90px var(--clr-neon-cyan), inset 0 0 30px var(--clr-neon-magenta); }
     100% { box-shadow: 0 0 25px var(--c), 0 0 60px var(--clr-neon-magenta), inset 0 0 25px var(--clr-neon-cyan); }
 }
 
-/* Logo à l’intérieur */
 #pokeball-clone .team-logo {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    padding: 4px;
-    background: rgba(255,255,255,0.2);
-    box-shadow: inset 0 0 15px #fff5;
+    width: 70px; height: 70px; border-radius: 50%; border: 3px solid #fff;
+    padding: 4px; background: rgba(255,255,255,0.2); box-shadow: inset 0 0 15px #fff5;
     margin-bottom: .6rem;
 }
-
-/* Texte dans le badge */
 #pokeball-clone .team-name {
-    font-family: var(--ff-title);
-    font-size: 1.1rem;
-    text-shadow: 0 0 10px var(--clr-neon-cyan);
+    font-family: var(--ff-title); font-size: 1.1rem; text-shadow: 0 0 10px var(--clr-neon-cyan);
 }
 #pokeball-clone .team-region {
-    font-size: .85rem;
-    opacity: .85;
+    font-size: .85rem; opacity: .85;
 }
