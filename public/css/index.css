@@ -53,7 +53,6 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 .btn-adventure .btn-adventure__glitch{position:absolute;inset:0;opacity:0;pointer-events:none}
 .btn-adventure:hover .btn-adventure__glitch{opacity:.8;animation:glitch .25s infinite}
 @keyframes glitch{0%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(-2px,-2px)}60%{transform:translate(2px,2px)}80%{transform:translate(2px,-2px)}100%{transform:translate(0)}}
-
 /* ==========================================================
    TITRE SECTION
    ========================================================== */
@@ -65,16 +64,6 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     color:var(--clr-neon-cyan);
     text-shadow:0 0 8px var(--clr-neon-cyan), 0 0 16px var(--clr-neon-magenta);
     letter-spacing:2px;
-    position:relative;
-}
-.pokeball-title::after{
-    content:"";
-    display:block;
-    width:80px;
-    height:3px;
-    background:var(--clr-neon-cyan);
-    margin:.8rem auto 0;
-    box-shadow:0 0 8px var(--clr-neon-cyan);
 }
 
 /* ==========================================================
@@ -90,27 +79,29 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 }
 .pokeball-center{
     position:absolute;
+    inset:0;
     width:240px;
     height:240px;
     border-radius:50%;
     background:var(--clr-bg);
     border:3px solid var(--clr-neon-cyan);
     box-shadow:inset 0 0 20px var(--clr-neon-cyan), 0 0 20px var(--clr-neon-cyan);
-    z-index:0;
+    z-index:5;
+    margin:auto;
 }
 
 /* ----- 10 cartes-cercles ----- */
 .team-card{
-    --angle:calc(360deg / 10 * var(--i));   /* 10 sections */
+    --angle:calc(360deg / 10 * var(--i));
     position:absolute;
-    top:50%; left:50%;
+    inset:0;
     width:150px;
     height:150px;
     border-radius:50%;
+    margin:auto;
     transform:
-        translate(-50%,-50%)
         rotate(var(--angle))
-        translateY(-260px)          /* rayon */
+        translateY(-260px)
         rotate(calc(-1 * var(--angle)));
     background:radial-gradient(circle at 30% 30%, #fff2, transparent 40%), var(--clr-glass);
     border:3px solid var(--c);
@@ -118,11 +109,10 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     place-content:center;
     cursor:pointer;
     transition:transform .5s cubic-bezier(.68,-.55,.27,1.55), box-shadow .3s;
-    z-index:1;
+    z-index:10;
 }
 .team-card:hover{
     transform:
-        translate(-50%,-50%)
         rotate(var(--angle))
         translateY(-260px)
         rotate(calc(-1 * var(--angle)))
@@ -133,6 +123,7 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 /* ----- checkbox hack ----- */
 .team-card input{
     position:absolute;
+    inset:0;
     width:100%; height:100%;
     opacity:0; cursor:pointer; z-index:2;
 }
@@ -141,13 +132,39 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
     pointer-events:none;
     transition:transform .4s;
 }
+
+/* ==========================================================
+   ANIMATION – CENTRE ÉCRAN (FIX ABSOLU)
+   ========================================================== */
 .team-card input:checked ~ .team-info{
-    animation:pokeballCenter .6s forwards;
+    position:fixed;
+    inset:0;
+    margin:auto;
+    width:max-content;
+    max-width:90vw;
+    padding:2rem 3rem;
+    background:var(--clr-glass);
+    border:3px solid var(--c);
+    border-radius:16px;
+    backdrop-filter:blur(10px);
+    z-index:999;
+    animation:pokeballPop .6s forwards;
 }
-@keyframes pokeballCenter{
-    0%{transform:scale(1) rotate(0); opacity:1}
-    50%{transform:scale(1.5) rotate(360deg); opacity:.8}
-    100%{transform:scale(1.4) rotate(720deg); opacity:1}
+@keyframes pokeballPop{
+    0%{transform:scale(.2) rotate(0); opacity:0}
+    50%{transform:scale(1.3) rotate(180deg); opacity:.8}
+    100%{transform:scale(1) rotate(360deg); opacity:1}
+}
+
+/* ----- fermeture au reclic ----- */
+.team-card input:checked{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    z-index:998;
+    background:transparent;
+    border:none;
 }
 
 /* ----- logo ----- */
@@ -173,13 +190,17 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 .team-region{font-size:.65rem; opacity:.75}
 .team-credo{font-size:.6rem; font-style:italic; margin-top:.2rem; opacity:.9; line-height:1.3}
 
-/* ===== RESPONSIVE ===== */
+/* ==========================================================
+   RESPONSIVE – MOBILE
+   ========================================================== */
 @media (max-width:700px){
     .pokeball-ring{width:90vw; height:90vw}
-    .team-card{width:110px; height:110px; transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-42vw) rotate(calc(-1 * var(--angle)))}
+    .team-card{width:110px; height:110px; transform:rotate(var(--angle)) translateY(-42vw) rotate(calc(-1 * var(--angle)))}
 }
 
-/* ===== CHAT GLOBAL ===== */
+/* ==========================================================
+   CHAT GLOBAL
+   ========================================================== */
 .global-chat{max-width:800px;margin:3rem auto 4rem;background:#111;border:2px solid var(--clr-neon-cyan);border-radius:12px;padding:1.5rem;box-shadow:0 0 12px var(--clr-neon-cyan)}
 .global-chat h3{color:var(--clr-neon-cyan);margin-bottom:1rem;text-shadow:0 0 6px var(--clr-neon-cyan)}
 .chat-messages{height:250px;overflow-y:auto;background:#000;border:1px solid #333;border-radius:6px;padding:.5rem;margin:.5rem 0;font-size:.8rem}
@@ -187,3 +208,165 @@ body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") cente
 .chat-form input{flex:1;padding:.5rem;border:1px solid #555;border-radius:4px;background:#222;color:#fff}
 .chat-form button{padding:.5rem .9rem;border:none;border-radius:4px;background:var(--clr-neon-cyan);color:#000;font-weight:bold;cursor:pointer;transition:.3s}
 .chat-form button:hover{background:#ffdd33}
+/* ==========================================================
+   ANIMATION DYNAMIQUE — BADGE POKÉMON CENTRAL
+   ========================================================== */
+@keyframes pokeballBadgePop {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+        filter: blur(10px);
+    }
+    40% {
+        transform: scale(1.4) rotate(180deg);
+        opacity: 0.9;
+        filter: blur(2px);
+    }
+    70% {
+        transform: scale(0.9) rotate(270deg);
+        opacity: 1;
+        filter: blur(0);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+/* Style du badge central */
+#pokeball-clone {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    text-align: center;
+    font-family: var(--ff-title);
+    color: var(--clr-neon-cyan);
+    background: radial-gradient(circle at 30% 30%, #ffffff20, transparent 60%), var(--clr-glass);
+    box-shadow:
+        0 0 25px var(--clr-neon-cyan),
+        0 0 60px var(--clr-neon-magenta),
+        inset 0 0 25px var(--clr-neon-cyan);
+    animation: pokeballBadgePop 0.8s cubic-bezier(.68,-0.55,.27,1.55);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(12px);
+    transition: transform .3s, box-shadow .3s;
+}
+
+#pokeball-clone:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow:
+        0 0 40px var(--clr-neon-magenta),
+        0 0 80px var(--clr-neon-cyan),
+        inset 0 0 30px var(--clr-neon-magenta);
+}
+
+/* Texte à l’intérieur du badge */
+#pokeball-clone .team-name {
+    font-size: 1.1rem;
+    color: var(--clr-neon-cyan);
+    text-shadow: 0 0 10px var(--clr-neon-magenta);
+    margin-top: .4rem;
+}
+#pokeball-clone .team-region {
+    font-size: .8rem;
+    opacity: .8;
+}
+/* ==========================================================
+   BADGE DE LIGUE POKÉMON – STYLE & ANIMATIONS
+   ========================================================== */
+
+/* Apparition / disparition */
+@keyframes pokeballBadgeAppear {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+        filter: blur(10px);
+    }
+    40% {
+        transform: scale(1.4) rotate(180deg);
+        opacity: 1;
+        filter: blur(2px);
+    }
+    70% {
+        transform: scale(0.9) rotate(270deg);
+        filter: blur(0);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+    }
+}
+@keyframes pokeballBadgeDisappear {
+    from { transform: scale(1) rotate(0); opacity: 1; }
+    to   { transform: scale(0) rotate(-180deg); opacity: 0; }
+}
+
+/* Style du badge */
+#pokeball-clone {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 30% 30%, #ffffff33, transparent 70%),
+        conic-gradient(from 0deg, var(--c), var(--clr-neon-magenta), var(--c));
+    border: 4px solid var(--c);
+    box-shadow:
+        0 0 30px var(--c),
+        0 0 80px var(--clr-neon-magenta),
+        inset 0 0 30px var(--clr-neon-cyan);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    z-index: 999;
+    cursor: pointer;
+    overflow: hidden;
+    animation: spinHalo 5s linear infinite;
+}
+#pokeball-clone::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent, var(--c), transparent 60%);
+    animation: rotateLight 3s linear infinite;
+    opacity: 0.5;
+}
+@keyframes rotateLight {
+    to { transform: rotate(360deg); }
+}
+@keyframes spinHalo {
+    0% { box-shadow: 0 0 25px var(--c), 0 0 60px var(--clr-neon-magenta), inset 0 0 25px var(--clr-neon-cyan); }
+    50% { box-shadow: 0 0 40px var(--clr-neon-magenta), 0 0 90px var(--clr-neon-cyan), inset 0 0 30px var(--clr-neon-magenta); }
+    100% { box-shadow: 0 0 25px var(--c), 0 0 60px var(--clr-neon-magenta), inset 0 0 25px var(--clr-neon-cyan); }
+}
+
+/* Logo à l’intérieur */
+#pokeball-clone .team-logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    padding: 4px;
+    background: rgba(255,255,255,0.2);
+    box-shadow: inset 0 0 15px #fff5;
+    margin-bottom: .6rem;
+}
+
+/* Texte dans le badge */
+#pokeball-clone .team-name {
+    font-family: var(--ff-title);
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px var(--clr-neon-cyan);
+}
+#pokeball-clone .team-region {
+    font-size: .85rem;
+    opacity: .85;
+}

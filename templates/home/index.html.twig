@@ -34,6 +34,7 @@
 
 <h2 class="pokeball-title">Index des organisations criminelles</h2>
 <div class="pokeball-ring">
+
     {% for team in teams %}
         <label class="team-card" style="--c:{{ team.colorCode }}; --i:{{ loop.index0 }};">
             <input type="checkbox" aria-hidden="true">
@@ -41,7 +42,6 @@
             <div class="team-info">
                 <div class="team-name">{{ team.name }}</div>
                 <div class="team-region">Région : {{ team.region }}</div>
-                <div class="team-credo">« {{ team.credo }} »</div>
             </div>
         </label>
     {% endfor %}
@@ -60,17 +60,73 @@
 {% endblock %}
 
 {% block javascripts %}
+
 <script>
-/* typewriter effect */
+/* === Effet machine à écrire === */
 document.querySelectorAll('.typewriter').forEach(el=>{
     const txt=el.dataset.text, delay=45;
     let i=0;
     el.classList.add('typing');
-    function type(){
+    (function type(){
         el.textContent=txt.slice(0,++i);
         if(i<=txt.length) setTimeout(type,delay+Math.random()*20);
+    })();
+});
+
+/* === Animation centrale dynamique — badge Pokémon === */
+const ring = document.querySelector('.pokeball-ring');
+let currentClone = null;
+
+/* --- OUVERTURE / REMPLACEMENT --- */
+ring.addEventListener('click', e => {
+    const card = e.target.closest('.team-card');
+    if (!card) return;
+
+    const info  = card.querySelector('.team-info');
+    const color = getComputedStyle(card).getPropertyValue('--c');
+    const logo  = card.querySelector('.team-logo').cloneNode(true);
+
+    /* S’il y a déjà un badge, on le remplace directement */
+    if (currentClone) {
+        currentClone.remove();
+        currentClone = null;
     }
-    type();
+
+    /* Création du badge central */
+    currentClone = document.createElement('div');
+    currentClone.id = 'pokeball-clone';
+    currentClone.style.setProperty('--c', color);
+
+    /* contenu du badge */
+    currentClone.appendChild(logo);
+    currentClone.appendChild(info.cloneNode(true));
+
+    document.body.appendChild(currentClone);
+
+    /* Animation d’apparition */
+    currentClone.style.animation = 'pokeballBadgeAppear 0.9s cubic-bezier(.68,-0.55,.27,1.55) forwards';
+
+    /* Fermeture au clic sur le badge */
+    currentClone.addEventListener('click', () => {
+        currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+        setTimeout(() => {
+            currentClone.remove();
+            currentClone = null;
+        }, 450);
+    });
+});
+
+/* Fermeture si clic à l’extérieur */
+document.addEventListener('click', e => {
+    if (currentClone && !e.target.closest('#pokeball-clone') && !e.target.closest('.team-card')) {
+        currentClone.style.animation = 'pokeballBadgeDisappear .5s ease forwards';
+        setTimeout(() => {
+            currentClone.remove();
+            currentClone = null;
+        }, 450);
+    }
 });
 </script>
+
+
 {% endblock %}
