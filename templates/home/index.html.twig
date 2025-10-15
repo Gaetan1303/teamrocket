@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/index.css') }}">
 {% endblock %}
 
@@ -24,8 +24,7 @@
             <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
         {% else %}
             <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
-            {# Modification de la route Team pour faire correspondre la mission à la Team#}
-          <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
+            <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
                 <span class="btn-adventure__text">Commencez l'aventure !</span>
                 <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
             </a>
@@ -33,24 +32,24 @@
     </div>
 </section>
 
-<section class="teams-detail container">
-    <h3 class="text-center mb-5" style="font-family:'Orbitron',sans-serif;">Index des organisations criminelles</h3>
+<h2 class="pokeball-title">Index des organisations criminelles</h2>
+<div class="pokeball-ring">
     {% for team in teams %}
-        {% set filename = team.name|lower|replace({' ':'-', 'é':'e', 'è':'e', 'æ':'ae'}) ~ '.png' %}
-        <div class="team-card" style="--c:{{ team.colorCode }};">
-            <img src="{{ asset('images/icones/' ~ filename) }}" alt="Logo {{ team.name }}" class="team-logo" width="80" height="80">
+        <label class="team-card" style="--c:{{ team.colorCode }}; --i:{{ loop.index0 }};">
+            <input type="checkbox" aria-hidden="true">
+            <img src="{{ asset('images/icones/' ~ (team.name|lower|replace({' ':'-','é':'e','è':'e','æ':'ae'})~'.png')) }}" alt="Logo {{ team.name }}" class="team-logo">
             <div class="team-info">
-                <div class="team-name" style="color:{{ team.colorCode }};">{{ team.name }}</div>
+                <div class="team-name">{{ team.name }}</div>
                 <div class="team-region">Région : {{ team.region }}</div>
                 <div class="team-credo">« {{ team.credo }} »</div>
             </div>
-        </div>
+        </label>
     {% endfor %}
-</section>
+</div>
 
 {% if app.user %}
     <section class="global-chat mt-5">
-        <h3 class="text-center" style="font-family:'Orbitron',sans-serif;">Tu veux communiquer avec les autres sbires ? =></h3>
+        <h3 class="text-center" style="font-family:'Orbitron',sans-serif;">Tu veux communiquer avec les autres sbires ?</h3>
         {{ include('chat_widget/chatwidget.html.twig', {
             channels:    channels,
             mercure_url: mercure_url,
@@ -60,5 +59,18 @@
 {% endif %}
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
-{% block footer %}{% endblock %}
+{% block javascripts %}
+<script>
+/* typewriter effect */
+document.querySelectorAll('.typewriter').forEach(el=>{
+    const txt=el.dataset.text, delay=45;
+    let i=0;
+    el.classList.add('typing');
+    function type(){
+        el.textContent=txt.slice(0,++i);
+        if(i<=txt.length) setTimeout(type,delay+Math.random()*20);
+    }
+    type();
+});
+</script>
+{% endblock %}

@@ -2,7 +2,6 @@
 // src/Entity/Sbire.php
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -36,7 +35,17 @@ class Sbire
     #[ORM\Column(type: 'smallint')]
     private int $speed = 1;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $hasDoneFirstTheft = false;
+
+    #[ORM\ManyToOne(targetEntity: Pokemon::class)]
+    #[ORM\JoinColumn(name: 'starter_pokemon_id', referencedColumnName: 'id', nullable: true)]
+    private ?Pokemon $starterPokemon = null;
+
+    /* ─── Getters / Setters ─── */
+
     public function getId(): ?int { return $this->id; }
+
     public function getUser(): User { return $this->user; }
     public function setUser(User $user): self { $this->user = $user; return $this; }
 
@@ -58,9 +67,9 @@ class Sbire
     public function getSpeed(): int { return $this->speed; }
     public function setSpeed(int $speed): self { $this->speed = $speed; return $this; }
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
-private bool $hasDoneFirstTheft = false;
+    public function isHasDoneFirstTheft(): bool { return $this->hasDoneFirstTheft; }
+    public function setHasDoneFirstTheft(bool $hasDoneFirstTheft): self { $this->hasDoneFirstTheft = $hasDoneFirstTheft; return $this; }
 
-#[ORM\Column(type: 'integer', nullable: true, unique: true)]
-private ?int $starterPokemonId = null;
+    public function getStarterPokemon(): ?Pokemon { return $this->starterPokemon; }
+    public function setStarterPokemon(?Pokemon $starterPokemon): self { $this->starterPokemon = $starterPokemon; return $this; }
 }

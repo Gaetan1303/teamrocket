@@ -1,288 +1,189 @@
+/* ==========================================================
+   VARIABLES COULEURS TEAM
+   ========================================================== */
 :root {
-    --rocket: #8B3A3A;
-    --aqua: #2563EB;
-    --magma: #DC2626;
-    --galaxie: #4B0082;
-    --plasma: #FFFFFF;
-    --flare: #FF4500;
-    --skull: #6B7280;
-    --aether: #10B981;
-    --rainbow: #000;
-    --star: #F59E0B;
-    --clr-primary: #ffcc00;
-    --clr-accent: #ffcc00;
+    --rocket:#8B3A3A; --aqua:#2563EB; --magma:#DC2626;
+    --galaxie:#4B0082; --plasma:#FFFFFF; --flare:#FF4500;
+    --skull:#6B7280; --aether:#10B981; --rainbow:#000; --star:#F59E0B;
+    --clr-neon-cyan:#00f0ff;
+    --clr-neon-magenta:#ff00c1;
+    --clr-bg:#0d0d17;
+    --clr-glass:rgba(0,0,0,.55);
+    --ff-title:'Orbitron',monospace;
+    --ff-body:'Roboto',sans-serif;
 }
 
-/* ---------- Banner + nav ---------- */
-.poke-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2rem 3rem;
-    background: #111;
-    border-bottom: 3px solid var(--clr-primary);
-}
-.poke-banner h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2.2rem;
-    color: var(--clr-primary);
-    text-shadow: 0 0 6px var(--clr-primary);
-}
-.poke-nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-family: 'Orbitron', sans-serif;
-}
-.btn-nav {
-    padding: 0.55rem 1.1rem;
-    border: 2px solid var(--clr-primary);
-    background: rgba(0, 0, 0, .55);
-    color: var(--clr-primary);
-    border-radius: 6px;
-    text-decoration: none;
-    transition: 0.3s;
-    box-shadow: 0 0 6px var(--clr-primary);
-}
-.btn-nav:hover {
-    background: var(--clr-primary);
-    color: #000;
-}
-.nav-welcome {
-    color: #fff;
-    margin-right: 0.5rem;
-}
+body{background:var(--clr-bg) url("{{ asset('images/pokeball-bg.png') }}") center center/500px auto fixed}
 
-/* ---------- Scrolling credos ---------- */
-.scrolling-credo {
-    overflow: hidden;
-    white-space: nowrap;
-    background: #000;
-    border-top: 3px solid var(--clr-primary);
-    border-bottom: 3px solid var(--clr-primary);
-    padding: 1rem 0;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-    color: var(--clr-accent);
-    text-shadow: 0 0 4px var(--clr-accent);
-}
-.scrolling-credo div {
-    display: inline-block;
-    padding-left: 100%;
-    animation: scroll-left 60s linear infinite;
-}
-@keyframes scroll-left {
-    to { transform: translateX(-100%) }
-}
-.scrolling-credo span {
-    margin-right: 5rem;
-}
-
-/* ---------- CTA cellule unique animée ---------- */
-.cta-cell {
-    display: grid;
-    place-content: center;
-    padding: 4rem 1rem;
-}
-.dialog-box {
-    position: relative;
-    background: rgba(0, 0, 0, .75);
-    border: 3px solid var(--clr-primary);
-    border-radius: 12px;
-    padding: 2rem 3rem;
-    max-width: 600px;
-    text-align: center;
-    box-shadow: 0 0 12px var(--clr-primary), inset 0 0 8px var(--clr-primary);
-    animation: borderPulse 2s infinite;
-}
-@keyframes borderPulse {
-    0%, 100% {
-        box-shadow: 0 0 12px var(--clr-primary), inset 0 0 8px var(--clr-primary);
-    }
-    50% {
-        box-shadow: 0 0 20px #ffcc00, inset 0 0 12px #ffcc00;
-    }
-}
-.typewriter {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.3rem;
-    color: var(--clr-accent);
-    min-height: 3.2rem;
-}
-.typewriter.typing::after {
-    content: '▌';
-    animation: blink 1s infinite;
-}
-@keyframes blink {
-    50% { opacity: 0 }
-}
-.btn-cta {
-    display: inline-block;
-    margin-top: 1.5rem;
-    background: var(--clr-primary);
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: bold;
-    padding: 0.9rem 2rem;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(255, 204, 0, .5);
-    animation: pulseBtn 1.5s infinite;
-    transition: 0.3s;
-}
-.btn-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 15px #ffcc00;
-}
-@keyframes pulseBtn {
-    0%, 100% { transform: scale(1) }
-    50% { transform: scale(1.05) }
-}
-
-/* ---------- Section détails teams ---------- */
-.teams-detail {
-    padding: 4rem 0;
-    /* background: url('') center/cover fixed; */
-}
-.team-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    background: rgba(0, 0, 0, .55);
-    border: 3px solid;
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    transition: 0.3s;
-    overflow: hidden;
-}
-.team-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px var(--c), 0 0 40px var(--c);
-}
-.team-logo {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    border-radius: 50%;
-    background: #fff;
-    border: 4px solid var(--c);
-    padding: 6px;
-    transition: 0.3s;
-}
-.team-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-}
-.team-region {
-    font-size: 0.9rem;
-    opacity: .8;
-}
-.team-credo {
-    font-style: italic;
-    margin-top: 0.5rem;
-}
-/* ---------- Chat widget (connectés) ---------- */
-.global-chat {
-    max-width: 800px;
-    margin: 3rem auto;
-    background: #111;
-    border: 2px solid var(--clr-primary);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 0 12px var(--clr-primary);
-}
-.global-chat h3 {
-    color: var(--clr-primary);
-    margin-bottom: 1rem;
-    text-shadow: 0 0 6px var(--clr-primary);
-}
-.chat-widget select,
-.chat-widget input,
-.chat-widget button {
-    font-family: 'Roboto', sans-serif;
-}
-.chat-messages {
-    height: 250px;
-    overflow-y: auto;
-    background: #000;
-    color: #eee;
-    padding: .5rem;
-    margin: .5rem 0;
-    border: 1px solid #333;
-    border-radius: 6px;
-}
-.chat-form {
-    display: flex;
-    gap: .5rem;
-}
-.chat-form input {
-    flex: 1;
-    padding: .5rem;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background: #222;
-    color: #fff;
-}
-.chat-form button {
-    padding: .5rem .9rem;
-    border: none;
-    border-radius: 4px;
-    background: var(--clr-primary);
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    transition: .3s;
-}
-.chat-form button:hover {
-    background: #ffdd33;
-}
-/* Bouton animé « Commencez l'aventure ! » */
-/* ---------- Bouton animé INDEX « Commencez l'aventure ! » ---------- */
-.btn-adventure{
-    display:inline-block;
-    margin-top:1rem;               /* ← moins d’espace */
-    padding:.55rem 1.2rem;         /* ← un poil plus petit */
-    background:transparent;
-    color:#ffcc00;
-    font-family:'Orbitron',sans-serif;
-    font-size:1rem;                /* ← taille réduite */
-    font-weight:700;
-    border:2px solid #ffcc00;
-    border-radius:6px;
-    text-decoration:none;
-    position:relative;
+/* ==========================================================
+   BANDEAU DÉFILANT (ORIGINE)
+   ========================================================== */
+.scrolling-credo{
     overflow:hidden;
-    transition:.3s;
-    box-shadow:0 0 8px rgba(255,204,0,.6);
+    white-space:nowrap;
+    background:#000;
+    border-top:3px solid var(--clr-neon-cyan);
+    border-bottom:3px solid var(--clr-neon-cyan);
+    padding:1rem 0;
+    font-family:var(--ff-title);
+    font-size:1.1rem;
+    letter-spacing:1px;
+    color:var(--clr-neon-cyan);
+    text-shadow:0 0 4px var(--clr-neon-cyan);
 }
-.btn-adventure:hover{
-    background:#ffcc00;
-    color:#000;
-    box-shadow:0 0 16px #ffcc00;
+.scrolling-credo div{display:inline-block;padding-left:100%;animation:scroll-left 60s linear infinite}
+@keyframes scroll-left{to{transform:translateX(-100%)}}
+.scrolling-credo span{margin-right:5rem}
+
+/* ==========================================================
+   CTA CELL (ORIGINE)
+   ========================================================== */
+.cta-cell{display:grid;place-content:center;padding:4rem 1rem}
+.dialog-box{position:relative;background:rgba(0,0,0,.75);border:3px solid var(--clr-neon-cyan);border-radius:12px;padding:2rem 3rem;max-width:600px;text-align:center;box-shadow:0 0 12px var(--clr-neon-cyan),inset 0 0 8px var(--clr-neon-cyan);animation:borderPulse 2s infinite}
+@keyframes borderPulse{50%{box-shadow:0 0 20px #ffcc00,inset 0 0 12px #ffcc00}}
+.typewriter{font-family:var(--ff-title);font-size:1.3rem;color:var(--clr-neon-cyan);min-height:3.2rem}
+.typewriter.typing::after{content:'▌';animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+.btn-cta{display:inline-block;margin-top:1.5rem;background:var(--clr-neon-cyan);color:#000;font-size:1.1rem;font-weight:bold;padding:0.9rem 2rem;border:none;border-radius:8px;box-shadow:0 0 8px rgba(255,204,0,.5);animation:pulseBtn 1.5s infinite;transition:.3s}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 0 15px #ffcc00}
+@keyframes pulseBtn{50%{transform:scale(1.05)}}
+
+.btn-adventure{display:inline-block;margin-top:1rem;padding:.55rem 1.2rem;background:transparent;color:var(--clr-neon-cyan);font-family:var(--ff-title);font-size:1rem;font-weight:700;border:2px solid var(--clr-neon-cyan);border-radius:6px;text-decoration:none;position:relative;overflow:hidden;transition:.3s;box-shadow:0 0 8px rgba(255,204,0,.6)}
+.btn-adventure:hover{background:var(--clr-neon-cyan);color:#000;box-shadow:0 0 16px var(--clr-neon-cyan)}
+.btn-adventure .btn-adventure__glitch{position:absolute;inset:0;opacity:0;pointer-events:none}
+.btn-adventure:hover .btn-adventure__glitch{opacity:.8;animation:glitch .25s infinite}
+@keyframes glitch{0%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(-2px,-2px)}60%{transform:translate(2px,2px)}80%{transform:translate(2px,-2px)}100%{transform:translate(0)}}
+
+/* ==========================================================
+   TITRE SECTION
+   ========================================================== */
+.pokeball-title{
+    text-align:center;
+    margin:3rem 0 1rem;
+    font-family:var(--ff-title);
+    font-size:2.2rem;
+    color:var(--clr-neon-cyan);
+    text-shadow:0 0 8px var(--clr-neon-cyan), 0 0 16px var(--clr-neon-magenta);
+    letter-spacing:2px;
+    position:relative;
 }
-/* Le glitch n’est visible QUE quand on survole */
-.btn-adventure .btn-adventure__glitch{
+.pokeball-title::after{
+    content:"";
+    display:block;
+    width:80px;
+    height:3px;
+    background:var(--clr-neon-cyan);
+    margin:.8rem auto 0;
+    box-shadow:0 0 8px var(--clr-neon-cyan);
+}
+
+/* ==========================================================
+   CERCLE POKEBALL – 10 TEAMS
+   ========================================================== */
+.pokeball-ring{
+    position:relative;
+    width:600px;
+    height:600px;
+    margin:2rem auto;
+    display:grid;
+    place-content:center;
+}
+.pokeball-center{
     position:absolute;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    opacity:0;          /* ← caché par défaut */
+    width:240px;
+    height:240px;
+    border-radius:50%;
+    background:var(--clr-bg);
+    border:3px solid var(--clr-neon-cyan);
+    box-shadow:inset 0 0 20px var(--clr-neon-cyan), 0 0 20px var(--clr-neon-cyan);
+    z-index:0;
+}
+
+/* ----- 10 cartes-cercles ----- */
+.team-card{
+    --angle:calc(360deg / 10 * var(--i));   /* 10 sections */
+    position:absolute;
+    top:50%; left:50%;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    transform:
+        translate(-50%,-50%)
+        rotate(var(--angle))
+        translateY(-260px)          /* rayon */
+        rotate(calc(-1 * var(--angle)));
+    background:radial-gradient(circle at 30% 30%, #fff2, transparent 40%), var(--clr-glass);
+    border:3px solid var(--c);
+    display:grid;
+    place-content:center;
+    cursor:pointer;
+    transition:transform .5s cubic-bezier(.68,-.55,.27,1.55), box-shadow .3s;
+    z-index:1;
+}
+.team-card:hover{
+    transform:
+        translate(-50%,-50%)
+        rotate(var(--angle))
+        translateY(-260px)
+        rotate(calc(-1 * var(--angle)))
+        scale(1.1);
+    box-shadow:0 0 25px 4px var(--c), 0 0 45px -5px var(--clr-neon-magenta);
+}
+
+/* ----- checkbox hack ----- */
+.team-card input{
+    position:absolute;
+    width:100%; height:100%;
+    opacity:0; cursor:pointer; z-index:2;
+}
+.team-card .team-info{
+    text-align:center;
     pointer-events:none;
+    transition:transform .4s;
 }
-.btn-adventure:hover .btn-adventure__glitch{
-    opacity:.8;
-    animation:glitch .25s infinite;
+.team-card input:checked ~ .team-info{
+    animation:pokeballCenter .6s forwards;
 }
-@keyframes glitch{
-    0%{transform:translate(0)}
-    20%{transform:translate(-2px,2px)}
-    40%{transform:translate(-2px,-2px)}
-    60%{transform:translate(2px,2px)}
-    80%{transform:translate(2px,-2px)}
-    100%{transform:translate(0)}
+@keyframes pokeballCenter{
+    0%{transform:scale(1) rotate(0); opacity:1}
+    50%{transform:scale(1.5) rotate(360deg); opacity:.8}
+    100%{transform:scale(1.4) rotate(720deg); opacity:1}
 }
+
+/* ----- logo ----- */
+.team-logo{
+    width:55px; height:55px;
+    object-fit:contain;
+    border-radius:50%;
+    background:#fff2;
+    border:3px solid var(--c);
+    padding:4px;
+    margin-bottom:.4rem;
+    transition:.3s;
+}
+.team-card:hover .team-logo{transform:rotate(-10deg) scale(1.15)}
+
+/* ----- textes ----- */
+.team-name{
+    font-family:var(--ff-title);
+    font-size:.9rem;
+    color:var(--c);
+    text-shadow:0 0 6px var(--c);
+}
+.team-region{font-size:.65rem; opacity:.75}
+.team-credo{font-size:.6rem; font-style:italic; margin-top:.2rem; opacity:.9; line-height:1.3}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:700px){
+    .pokeball-ring{width:90vw; height:90vw}
+    .team-card{width:110px; height:110px; transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-42vw) rotate(calc(-1 * var(--angle)))}
+}
+
+/* ===== CHAT GLOBAL ===== */
+.global-chat{max-width:800px;margin:3rem auto 4rem;background:#111;border:2px solid var(--clr-neon-cyan);border-radius:12px;padding:1.5rem;box-shadow:0 0 12px var(--clr-neon-cyan)}
+.global-chat h3{color:var(--clr-neon-cyan);margin-bottom:1rem;text-shadow:0 0 6px var(--clr-neon-cyan)}
+.chat-messages{height:250px;overflow-y:auto;background:#000;border:1px solid #333;border-radius:6px;padding:.5rem;margin:.5rem 0;font-size:.8rem}
+.chat-form{display:flex;gap:.5rem}
+.chat-form input{flex:1;padding:.5rem;border:1px solid #555;border-radius:4px;background:#222;color:#fff}
+.chat-form button{padding:.5rem .9rem;border:none;border-radius:4px;background:var(--clr-neon-cyan);color:#000;font-weight:bold;cursor:pointer;transition:.3s}
+.chat-form button:hover{background:#ffdd33}
