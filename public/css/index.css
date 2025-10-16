@@ -230,70 +230,77 @@ body {
 }
 
 /* ==========================================================
-   CERCLE POKEBALL – 10 TEAMS
-   ========================================================== */
-/* ==========================================================
-   CERCLE POKEBALL – IMAGE DE FOND DERRIÈRE LES CARTES
+   CERCLE POKEBALL – IMAGE FIXE & CENTRÉE
    ========================================================== */
 .pokeball-ring {
-    position: relative;
-    width: 600px;                  /* ajuste si besoin */
+    position: relative;          /* contenant de référence */
+    width: 600px;
     height: 600px;
     margin: 2rem auto;
     display: grid;
     place-content: center;
-    background: var(--clr-bg) url("../images/pokeball-bg.png") center center / 280px auto no-repeat;
-    border-radius: 50%;            /* cercle visible si tu veux un contour */
-    /* (optionnel) border: 2px solid var(--clr-neon-cyan); */
-}
-.pokeball-center{
-    position:absolute;
-    inset:0;
-    width:240px;
-    height:240px;
-    border-radius:50%;
-    background:var(--clr-bg);
-    border:3px solid var(--clr-neon-cyan);
-    box-shadow:inset 0 0 20px var(--clr-neon-cyan), 0 0 20px var(--clr-neon-cyan);
-    z-index:5;
-    margin:auto;
+
+    /* 1 seule image centrée, PAS défile avec le scroll */
+    background: var(--clr-bg)
+                url("../images/pokeball-bg.png")
+                center center
+                / 400px auto        /* taille de la Poké-ball */
+                no-repeat;
+    border-radius: 50%;            /* cercle visible si tu veux */
+    /* (facultatif) border: 3px solid var(--clr-neon-cyan); */
 }
 
-/* ----- 10 cartes-cercles ----- */
-.team-card{
-    position:absolute;
-    inset:0;
-    width:150px;
-    height:150px;
-    border-radius:50%;
-    margin:auto;
-    background:radial-gradient(circle at 30% 30%, #fff2, transparent 40%), var(--clr-glass);
-    border:3px solid var(--c); /* Couleur dynamique */
-    display:grid;
-    place-content:center;
-    cursor:pointer;
-    transition:transform .5s cubic-bezier(.68,-.55,.27,1.55), box-shadow .3s;
-    z-index:10;
-}
-.team-card:hover{
-    box-shadow:0 0 25px 4px var(--c), 0 0 45px -5px var(--clr-neon-magenta);
-}
-
-/* Transformation appliquée par JS pour simuler Twig */
-
-/* ----- checkbox hack ----- */
-.team-card input{
-    position:absolute;
-    inset:0;
-    width:100%; height:100%;
-    opacity:0; cursor:pointer; z-index:2;
-}
-.team-card .team-info{
-    text-align:center;
-    pointer-events:none;
-    transition:transform .4s;
+/* ==========================================================
+   10 CARTES – POSITION ABSOLUE & FIXE
+   ========================================================== */
+.team-card {
+    position: absolute;            /* sort du flux -> pas de décalage */
+    inset: 0;                      /* centre par défaut */
+    margin: auto;                  /* vrai centre dans le parent */
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff2, transparent 40%),
+                var(--clr-glass);
+    border: 3px solid var(--c);
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+    transition: transform .5s cubic-bezier(.68, -.55, .27, 1.55),
+                box-shadow .3s;
+    z-index: 10;
 }
 
+.team-card:hover {
+    box-shadow: 0 0 25px 4px var(--c),
+                0 0 45px -5px var(--clr-neon-magenta);
+}
+
+/* ----- logo & textes ----- */
+.team-logo {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #fff2;
+    border: 3px solid var(--c);
+    padding: 4px;
+    margin-bottom: .4rem;
+    transition: .3s;
+}
+.team-card:hover .team-logo {
+    transform: rotate(-10deg) scale(1.15);
+}
+.team-name {
+    font-family: var(--ff-title);
+    font-size: .9rem;
+    color: var(--c);
+    text-shadow: 0 0 6px var(--c);
+}
+.team-region {
+    font-size: .65rem;
+    opacity: .75;
+}
 /* ==========================================================
    ANIMATION – CENTRE ÉCRAN (FIX ABSOLU)
    ========================================================== */
@@ -317,14 +324,14 @@ body {
     100%{transform:scale(1) rotate(360deg); opacity:1}
 }
 /* ----- fermeture au reclic ----- */
-.team-card input:checked{
-    position:fixed;
-    inset:0;
-    width:100vw;
-    height:100vh;
-    z-index:998;
-    background:transparent;
-    border:none;
+.team-card input[type="checkbox"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;          /* plus rien ne s’affiche */
+    pointer-events: none;/* empêche le clic direct sur la case */
+    z-index: 2;          /* laisse le clic passer au label */
 }
 
 /* ----- logo ----- */

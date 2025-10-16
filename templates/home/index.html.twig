@@ -46,23 +46,6 @@
             {% endfor %}
         </div>
     </section>
-
-    <!-- Cellule d'appel à l'action (CTA) -->
-    <section class="cta-cell">
-        <div class="dialog-box">
-            {% if not app.user %}
-                <p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
-                <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
-            {% else %}
-                <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
-                <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
-                    <span class="btn-adventure__text">Commencez l'aventure !</span>
-                    <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
-                </a>
-            {% endif %}
-        </div>
-    </section>
-
     <h2 class="pokeball-title">Index des organisations criminelles</h2>
     <div class="pokeball-ring">
 
@@ -79,6 +62,23 @@
             </label>
         {% endfor %}
     </div>
+    <!-- Cellule d'appel à l'action (CTA) -->
+    <section class="cta-cell">
+        <div class="dialog-box">
+            {% if not app.user %}
+                <p class="typewriter" data-text="Vous rêvez de grandeur, de méfaits et de Pokémon légendaires ? Choisissez votre camp."></p>
+                <a href="{{ path('app_register') }}" class="btn-cta">Postuler maintenant ▶</a>
+            {% else %}
+                <p class="typewriter" data-text="Prêt à commencer ton premier vol ?"></p>
+                <a href="{{ path('game_first_theft', {'team': app.user.teamVilain.name}) }}" class="btn-adventure">
+                    <span class="btn-adventure__text">Commencez l'aventure !</span>
+                    <span class="btn-adventure__glitch" aria-hidden="true">Commencez l'aventure !</span>
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+
 </div>
 
 {% if app.user %}
